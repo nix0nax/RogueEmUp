@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Diagnostics;
 
-public partial class PlayerNonKinetic : AnimatableBody2D
+public partial class Player : AnimatableBody2D
 {
 	public int speed ;
 	public bool jumping;

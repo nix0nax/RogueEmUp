@@ -7,7 +7,7 @@ size = Vector2(640, 180)
 size = Vector2(640, 1080)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ybn4v"]
-size = Vector2(640, 180)
+size = Vector2(640, 190)
 
 [node name="Floor" type="Node2D"]
 position = Vector2(322, 271)

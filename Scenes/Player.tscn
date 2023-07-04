@@ -1,6 +1,6 @@
 [gd_scene load_steps=24 format=3 uid="uid://b0imi271r2atx"]
 
-[ext_resource type="Script" path="res://PlayerNonKinetic.cs" id="1_fvldv"]
+[ext_resource type="Script" path="res://Scripts/Player.cs" id="1_ot84s"]
 [ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_dmbpv"]
 [ext_resource type="Texture2D" uid="uid://dx225gluoj0k6" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/run cycle 48x48.png" id="3_2ch7d"]
 
@@ -310,7 +310,8 @@ graph_offset = Vector2(-137, -3)
 [sub_resource type="AnimationNodeStateMachinePlayback" id="AnimationNodeStateMachinePlayback_f84ob"]
 
 [node name="AnimatableBody2D" type="AnimatableBody2D"]
-script = ExtResource("1_fvldv")
+sync_to_physics = false
+script = ExtResource("1_ot84s")
 
 [node name="EnviromentColission" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 13.5)
