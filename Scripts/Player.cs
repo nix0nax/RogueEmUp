@@ -8,17 +8,22 @@ public partial class Player : AnimatableBody2D
 	public bool jumping;
 	public bool collidingWithTop;
 
+	public AnimatedSprite2D animatedSprite;
+	public AnimationTree animationTree;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		speed = 6;
 		jumping = false;
 		collidingWithTop = false;
+		animationTree = GetNode<AnimationTree>("AnimationTree2");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		animationTree.Active = true;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -28,6 +33,11 @@ public partial class Player : AnimatableBody2D
 		// Get the input direction and handle the movement/deceleration.
 		// As good practice, you should replace UI actions with custom gameplay actions.
 		Vector2 direction = Input.GetVector("Left", "Right", "Up", "Down");
+
+		// var button = Input.GetActionStrength("Punch");
+		// if(button != 1){
+		// 	animatedSprite.Animation = "Punch";
+		// }
 
 		Animate(direction);
 		if (direction != Vector2.Zero)
@@ -49,6 +59,8 @@ public partial class Player : AnimatableBody2D
 
 		//ConstantLinearVelocity = velocity;
 		MoveAndCollide(velocity);
+
+
 	}
 
 	private void OnEnteredTopCollider(Node2D body)
@@ -71,4 +83,19 @@ public partial class Player : AnimatableBody2D
 	{
 
 	}
+
+	private void UpdateAnimationParameters(){
+		animationTree.Set("parameters/isIdle",true);
+
+	}
+
+	private void OnPunchHitAreaEntered(Area2D area)
+	{	
+		if(area.IsInGroup(new StringName("HurtBox"))){
+			
+		}
+	}
 }
+
+
+
