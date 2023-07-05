@@ -6,10 +6,14 @@ public partial class Player : AnimatableBody2D
 {
 	public int speed ;
 	public bool jumping;
+	public bool attacking;
+	public string directionString;
+	public bool moving;
 	public bool collidingWithTop;
+	Vector2 velocity;
 
 	public AnimatedSprite2D animatedSprite;
-	public AnimationTree animationTree;
+	public AnimationPlayer animationPlayer;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -17,18 +21,20 @@ public partial class Player : AnimatableBody2D
 		speed = 6;
 		jumping = false;
 		collidingWithTop = false;
-		animationTree = GetNode<AnimationTree>("AnimationTree2");
+		attacking = false;
+		directionString = "_right";
+		moving = false;
+		velocity = new Vector2(0,0);
+		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		animationTree.Active = true;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		Vector2 velocity = ConstantLinearVelocity;
 
 		// Get the input direction and handle the movement/deceleration.
 		// As good practice, you should replace UI actions with custom gameplay actions.
@@ -39,8 +45,7 @@ public partial class Player : AnimatableBody2D
 		// 	animatedSprite.Animation = "Punch";
 		// }
 
-		Animate(direction);
-		if (direction != Vector2.Zero)
+		if (!attacking)
 		{
 			float slowdown = 1F;
 			if (direction.X != 0 && direction.Y != 0)
@@ -55,12 +60,70 @@ public partial class Player : AnimatableBody2D
 			
 			velocity.X = direction.X * speed * slowdown;
 			velocity.Y = direction.Y * speed* slowdown;
+
+			if (direction == Vector2.Zero)
+			{
+				moving = false;
+			}
+			else
+			{
+				moving = true;
+			}
+
+			if (direction.X < 0)
+			{
+				directionString = "_left";
+			}
+			else if (direction.X > 0)
+			{
+				directionString = "_right";
+			}
 		}
 
-		//ConstantLinearVelocity = velocity;
+		if (attacking && !animationPlayer.IsPlaying())
+		{
+			attacking = false;
+		}
+
+		// Attacks go here
+		if (!attacking && Input.IsActionJustPressed("Attack"))
+		{
+			var attackType = string.Empty;
+			attacking = true;
+			moving = false;
+			velocity.X = 0;
+			velocity.Y = 0;
+
+			if (Input.IsActionJustPressed("Heavy"))
+			{
+				attackType = "heavy";
+			}
+			else if (Input.IsActionJustPressed("Heavy"))
+			{
+				attackType = "light";
+			}
+			else if (Input.IsActionJustPressed("Special"))
+			{
+				attackType = "special";
+			}
+
+			animationPlayer.Play($"{attackType}{directionString}");
+		};
+
+		// animate if not atttacking
+		if (!attacking)
+		{
+			if (moving)
+			{
+				animationPlayer.Play($"run{directionString}");
+			}
+			else
+			{
+				animationPlayer.Play($"idle{directionString}");
+			}
+		}
+		
 		MoveAndCollide(velocity);
-
-
 	}
 
 	private void OnEnteredTopCollider(Node2D body)
@@ -79,20 +142,24 @@ public partial class Player : AnimatableBody2D
 		}
 	}
 
-	private void Animate(Vector2 direction)
-	{
-
-	}
-
-	private void UpdateAnimationParameters(){
-		animationTree.Set("parameters/isIdle",true);
-
-	}
+	//private void UpdateAnimationParameters(){
+	//	animationTree.Set("parameters/isIdle",true);
+//
+	//}
 
 	private void OnPunchHitAreaEntered(Area2D area)
 	{	
 		if(area.IsInGroup(new StringName("HurtBox"))){
 			
+		}
+	}
+
+	private void HeavyHit(Node2D node)
+	{
+		Trace.WriteLine(node.GetType());
+		if (node.GetType() == typeof(PlantColission))
+		{
+			((PlantColission)node).TakeDamage(10);
 		}
 	}
 }

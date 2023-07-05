@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b02ooqixlntwx"]
+[gd_scene load_steps=5 format=3 uid="uid://b02ooqixlntwx"]
 
 [ext_resource type="Script" path="res://Scripts/Fight.cs" id="1_fersm"]
 [ext_resource type="PackedScene" uid="uid://5jefv0fulg8" path="res://Scenes/Floor.tscn" id="1_ypx55"]
 [ext_resource type="PackedScene" uid="uid://b0imi271r2atx" path="res://Scenes/Player.tscn" id="2_4m0ws"]
+[ext_resource type="PackedScene" uid="uid://uh5wf2a1binu" path="res://Scenes/Plant.tscn" id="4_wlata"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_fersm")
@@ -12,6 +13,9 @@ position = Vector2(320, 270)
 
 [node name="AnimatableBody2D" parent="." instance=ExtResource("2_4m0ws")]
 position = Vector2(33, 317)
+
+[node name="Plant" parent="." instance=ExtResource("4_wlata")]
+position = Vector2(266, 306)
 
 [connection signal="body_entered" from="Floor/Area2D" to="AnimatableBody2D" method="OnEnteredTopCollider"]
 [connection signal="body_exited" from="Floor/Area2D" to="AnimatableBody2D" method="OnExitedTopCollider"]

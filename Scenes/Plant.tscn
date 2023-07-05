@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://uh5wf2a1binu"]
+
+[ext_resource type="Script" path="res://Scripts/Plant.cs" id="1_efmfw"]
+[ext_resource type="Texture2D" uid="uid://c8kx7lv5rge6v" path="res://Resources/Sprites/plant.png" id="2_21cyb"]
+[ext_resource type="Script" path="res://Scripts/PlantColission.cs" id="3_ght6m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t16ub"]
+size = Vector2(48, 48)
+
+[node name="Plant" type="Node2D"]
+script = ExtResource("1_efmfw")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_21cyb")
+expand_mode = 1
+
+[node name="PlantColission" type="Area2D" parent="."]
+script = ExtResource("3_ght6m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlantColission"]
+shape = SubResource("RectangleShape2D_t16ub")

@@ -1,21 +1,25 @@
 using Godot;
 using System;
+using System.Diagnostics;
 
-public partial class Fight : Node2D
+public partial class Plant : Node2D
 {
-	[Signal]
-    public delegate void FightEndedEventHandler();
+	int hp;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		hp = 100;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (Input.IsActionJustPressed("Light"))
-		{
-			EmitSignal(SignalName.FightEnded);
-		}
+	}
+
+	public void TakeDamage(int damage)
+	{
+		hp -= damage;
+		Trace.WriteLine(hp);
 	}
 }
