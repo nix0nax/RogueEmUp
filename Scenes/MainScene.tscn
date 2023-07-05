@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdfs6yune5jvv"]
+
+[ext_resource type="PackedScene" uid="uid://5jefv0fulg8" path="res://Scenes/Floor.tscn" id="1_ea4fh"]
+[ext_resource type="PackedScene" uid="uid://b0imi271r2atx" path="res://Scenes/Player.tscn" id="2_cqi0r"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Floor" parent="." instance=ExtResource("1_ea4fh")]
+position = Vector2(320, 270)
+
+[node name="AnimatableBody2D" parent="." instance=ExtResource("2_cqi0r")]
+position = Vector2(33, 317)
+
+[connection signal="body_entered" from="Floor/Area2D" to="AnimatableBody2D" method="OnEnteredTopCollider"]
+[connection signal="body_exited" from="Floor/Area2D" to="AnimatableBody2D" method="OnExitedTopCollider"]
+
+[editable path="Floor"]

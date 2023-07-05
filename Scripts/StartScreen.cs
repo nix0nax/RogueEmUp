@@ -5,6 +5,9 @@ using System.Linq;
 
 public partial class StartScreen : Control
 {
+	
+	[Signal]
+    public delegate void GameStartedEventHandler();
 	AnimationPlayer animationPlayer;
 	bool aboutToStart;
 	// Called when the node enters the scene tree for the first time.
@@ -34,10 +37,9 @@ public partial class StartScreen : Control
 
 	public void AnimationDone(string animName)
 	{
-		Trace.Write("animationdone");
 		if (aboutToStart)
 		{
-			this.GetTree().ChangeSceneToFile("res://Scenes/main_scene.tscn");
+			EmitSignal(SignalName.GameStarted);
 		}
 	}
 }

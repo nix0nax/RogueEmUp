@@ -1,10 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://ckmy2idh2b2dh"]
+[gd_scene load_steps=3 format=3 uid="uid://cxvtn0ahuugi"]
 
-[ext_resource type="PackedScene" uid="uid://5jefv0fulg8" path="res://Scenes/Floor.tscn" id="1_7wyj2"]
-[ext_resource type="PackedScene" uid="uid://b0imi271r2atx" path="res://Scenes/Player.tscn" id="2_oespw"]
+[ext_resource type="Script" path="res://Scripts/Main.cs" id="1_hkmtg"]
+[ext_resource type="PackedScene" uid="uid://bd1g3xry3hsy1" path="res://Scenes/StartScreen.tscn" id="2_usisq"]
 
 [node name="Main" type="Node2D"]
+script = ExtResource("1_hkmtg")
 
-[node name="Floor" parent="." instance=ExtResource("1_7wyj2")]
-
-[node name="AnimatableBody2D" parent="." instance=ExtResource("2_oespw")]
+[node name="StartScreen" parent="." instance=ExtResource("2_usisq")]
