@@ -2,9 +2,9 @@ using Godot;
 using System;
 using System.Diagnostics;
 
-public partial class Enemy : AnimatableBody2D
+public partial class Enemy : Area2D
 {
-	public int speed ;
+	public int speed = 6 ;
 	public bool jumping;
 	public bool attacking;
 	public string directionString;
@@ -14,8 +14,16 @@ public partial class Enemy : AnimatableBody2D
 	Random rng;
 	Node rootNode;
 	int ct = 0;
-	bool decided = false;
+	bool decided;
+	Vector2 destination;
+	Vector2 direction;
+	int marginXLow = 25;
+	int marginXHigh = 35;
+	int marginY = 10;
 
+	Player player;
+
+	int health;
 
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
@@ -23,17 +31,20 @@ public partial class Enemy : AnimatableBody2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-
 		rootNode = this.GetTree().Root;
-		speed = 6;
+		player = (Player)rootNode.GetNode("Fight/Player");
+		rng = new Random();
+		velocity = new Vector2(0,0);
+
+		decided = false;
 		jumping = false;
 		collidingWithTop = false;
 		attacking = false;
 		directionString = "_right";
 		moving = false;
-		velocity = new Vector2(0,0);
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
-		rng = new Random();
+
+		health = 100;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -44,8 +55,6 @@ public partial class Enemy : AnimatableBody2D
 	public override void _PhysicsProcess(double delta)
 	{
 
-		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
 		// rnd = new Random();
 		// Vector2 direction =  new Vector2((float)rnd.NextDouble() * rnd.NextInt64(-1,1), (float)rnd.NextDouble() * rnd.NextInt64(-1,1));
 		// var button = Input.GetActionStrength("Punch");
@@ -53,42 +62,38 @@ public partial class Enemy : AnimatableBody2D
 		// 	animatedSprite.Animation = "Punch";
 		// }
 
-		var Player = (Player)rootNode.GetNode("Fight/Player");
-		Vector2 destination = new Vector2(0,0);
-		Vector2 direction = new Vector2(0,0);
 
 		if(!decided){
 			//naj si zbere kaj bo glede na random
 			long decision = rng.Next(1,3);
-			if(decision == 1){
-				direction = (Player.Position - this.Position).Normalized();
-				destination = (Player.Position - this.Position).Normalized();
-				decided = true;
-			}
-				//	Idi do playerja pa ga vsipaj
-			if(decision == 2){
-				Vector2 rngVector = new Vector2(rng.Next(100,600),rng.Next(190-350));
-				direction = rngVector;
-				destination = rngVector;
-				decided = true;
-			}
-				//	Idi na random location			
-		}
 
+			switch(decision)
+			{
+				case 1:
+					//	Idi do playerja pa ga vsipaj
+					direction = (player.Position - this.Position).Normalized();
+					destination = new Vector2(player.Position.X, player.Position.Y);
+					break;
+				case 2:
+					//	Idi na random location	
+					Vector2 rngVector = new Vector2(rng.Next(100,600),rng.Next(190,350));
+					destination =  rngVector;
+					direction = (destination - this.Position).Normalized();;
+					break;
+			}
+
+			decided = true;
+		}
 
 		// DECISIONS	
 		// naj gre do playerja
 		// gre na random location
 		// ko je dovol blizu ga naj vsipa
 
-
-		if(!(Math.Abs(Player.Position.X - this.Position.X) > 25 || Math.Abs(Player.Position.Y - this.Position.Y) > 25) ){
-			ct++;
-			//Trace.WriteLine($"yee {ct}");
+		var distance = destination - Position;
+		if(Math.Abs(distance.X) < marginXHigh && Math.Abs(distance.Y) < marginXHigh){
+			decided = false;
 		}
-
-
-
 
 		// (100-600,190-350)
 
@@ -134,48 +139,54 @@ public partial class Enemy : AnimatableBody2D
 			attacking = false;
 		}
 
-		// // Attacks go here
-		// if (!attacking && Input.IsActionJustPressed("Attack"))
-		// {
-		// 	var attackType = string.Empty;
-		// 	attacking = true;
-		// 	moving = false;
-		// 	velocity.X = 0;
-		// 	velocity.Y = 0;
+		var distanceToPlayer = player.Position - Position;
+		// Attacks go here
+		if (!attacking && Math.Abs(distanceToPlayer.X) < marginXHigh && Math.Abs(distanceToPlayer.X) > marginXLow && Math.Abs(distanceToPlayer.Y) < marginY)
+		{
+			var attackType = string.Empty;
+			attacking = true;
+			moving = false;
+			velocity.X = 0;
+			velocity.Y = 0;
+			
+			long decision = rng.Next(1,2);
 
-		// 	if (Input.IsActionJustPressed("Heavy"))
-		// 	{
-		// 		attackType = "heavy";
-		// 	}
-		// 	//else if (Input.IsActionJustPressed("Light"))
-		// 	//{
-		// 	//	attackType = "light";
-		// 	//}
-		// 	else if (Input.IsActionJustPressed("Special"))
-		// 	{
-		// 		attackType = "special";
-		// 	}
+			if (distanceToPlayer.X > 0)
+			{
+				directionString = "_right";
+			}
+			else
+			{
+				directionString = "_left";
+			}
 
-		// 	if (!string.IsNullOrEmpty(attackType))
-		// 	{
-		// 		animationPlayer.Play($"{attackType}{directionString}");
-		// 	}
-		// };
+			switch(decision)
+			{
+				case 1:
+					attackType = "heavy";
+					break;
+			}
 
-		// // animate if not atttacking
-		// if (!attacking)
-		// {
-		// 	if (moving)
-		// 	{
-		// 		animationPlayer.Play($"run{directionString}");
-		// 	}
-		// 	else
-		// 	{
-		// 		animationPlayer.Play($"idle{directionString}");
-		// 	}
-		// }
+			if (!string.IsNullOrEmpty(attackType))
+			{
+				animationPlayer.Play($"{attackType}{directionString}");
+			}
+		};
+
+		// animate if not atttacking
+		if (!attacking)
+		{
+			if (moving)
+			{
+				animationPlayer.Play($"run{directionString}");
+			}
+			else
+			{
+				animationPlayer.Play($"idle{directionString}");
+			}
+		}
 		
-		MoveAndCollide(velocity);
+		this.Position += velocity;
 	}
 
 	//private void UpdateAnimationParameters(){
@@ -192,11 +203,15 @@ public partial class Enemy : AnimatableBody2D
 
 	private void HeavyHit(Node2D node)
 	{
-		//Trace.WriteLine(node.GetType());
 		if (node.GetType() == typeof(PlantColission))
 		{
 			((PlantColission)node).TakeDamage(10);
 		}
+	}
+
+	public void TakeDamage(int damage)
+	{
+		health -= damage;
 	}
 }
 

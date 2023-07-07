@@ -1,6 +1,5 @@
-[gd_scene load_steps=21 format=3 uid="uid://d3yfdjkdwfmjy"]
+[gd_scene load_steps=20 format=3 uid="uid://d3yfdjkdwfmjy"]
 
-[ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_mp3wa"]
 [ext_resource type="Texture2D" uid="uid://cf2lxoisaiixw" path="res://Resources/SpriteSheets/Skeleton/Skeleton Attack.png" id="3_7roam"]
 [ext_resource type="Texture2D" uid="uid://6p5cwymldknj" path="res://Resources/SpriteSheets/Skeleton/Skeleton Idle.png" id="4_b0ute"]
 [ext_resource type="Texture2D" uid="uid://cy8veu64pxbr3" path="res://Resources/SpriteSheets/Skeleton/Skeleton Walk.png" id="5_fn6g0"]
@@ -232,7 +231,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("2_mp3wa")]
+"values": [ExtResource("4_b0ute")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -638,7 +637,7 @@ shape = SubResource("RectangleShape2D_figex")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(1, 0.995634)
-texture = ExtResource("2_mp3wa")
+texture = ExtResource("4_b0ute")
 flip_h = true
 hframes = 10
 

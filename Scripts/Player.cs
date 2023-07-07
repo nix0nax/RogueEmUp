@@ -8,6 +8,8 @@ public partial class Player : AnimatableBody2D
 	public int speed ;
 	public bool jumping;
 	public bool attacking;
+	public bool canComboTimer;
+	public bool canComboInput;
 	public string directionString;
 	public bool moving;
 	public bool collidingWithTop;
@@ -16,11 +18,23 @@ public partial class Player : AnimatableBody2D
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
 
+	Timer comboTimer;
 	Node rootNode;
 	Main mainNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		comboTimer = new Timer();
+		comboTimer.OneShot = true;
+		comboTimer.Timeout += () =>
+		{
+			canComboTimer = false;
+			Trace.WriteLine(canComboInput);
+		};
+		canComboTimer = false;
+		canComboInput = true;
+		this.AddChild(comboTimer);
+
 		health = 100;
 		rootNode = this.GetTree().Root;
 		mainNode = rootNode.GetNode<Main>("Main");
@@ -89,13 +103,20 @@ public partial class Player : AnimatableBody2D
 		if (attacking && !animationPlayer.IsPlaying())
 		{
 			attacking = false;
+			canComboInput = true;
+		}
+		
+		if (attacking && !canComboTimer && Input.IsActionJustPressed("Attack"))
+		{
+			canComboInput = false;
 		}
 
 		// Attacks go here
-		if (!attacking && Input.IsActionJustPressed("Attack"))
+		if ((!attacking || (canComboTimer && canComboInput)) && Input.IsActionJustPressed("Attack"))
 		{
 			var attackType = string.Empty;
 			attacking = true;
+			canComboTimer = false;
 			moving = false;
 			velocity.X = 0;
 			velocity.Y = 0;
@@ -117,6 +138,7 @@ public partial class Player : AnimatableBody2D
 
 			if (!string.IsNullOrEmpty(attackType))
 			{
+				animationPlayer.Stop();
 				animationPlayer.Play($"{attackType}{directionString}");
 			}
 		};
@@ -152,9 +174,18 @@ public partial class Player : AnimatableBody2D
 	private void HeavyHit(Node2D node)
 	{
 		//Trace.WriteLine(node.GetType());
+		if (node.GetType() == typeof(EnemyHitbox))
+		{
+			((EnemyHitbox)node).TakeDamage(10);
+			comboTimer.Start(0.1);
+			canComboTimer = true;
+		}
+
 		if (node.GetType() == typeof(PlantColission))
 		{
 			((PlantColission)node).TakeDamage(10);
+			comboTimer.Start(0.1);
+			canComboTimer = true;
 		}
 	}
 

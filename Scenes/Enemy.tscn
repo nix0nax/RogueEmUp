@@ -1,10 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://qby3oyg0v5yp"]
+[gd_scene load_steps=18 format=3 uid="uid://qby3oyg0v5yp"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.cs" id="1_i5pdw"]
 [ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_w66es"]
 [ext_resource type="Texture2D" uid="uid://catoaw6bjicg" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Enemy Idle 48x48.png" id="3_iv5mp"]
 [ext_resource type="Texture2D" uid="uid://cfrc1fn4ru7u3" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Player Punch/Enemy Punch 64x64.png" id="4_0jh0d"]
 [ext_resource type="Texture2D" uid="uid://ce4dj5k08ib1u" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Enemy run cycle 48x48.png" id="5_qmxe4"]
+[ext_resource type="Script" path="res://Scripts/EnemyHitbox.cs" id="6_obxiu"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_figex"]
 size = Vector2(19, 5)
@@ -448,8 +449,10 @@ _data = {
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n78j1"]
 size = Vector2(16, 14)
 
-[node name="AnimatableBody2D" type="AnimatableBody2D"]
-sync_to_physics = false
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wbpvn"]
+size = Vector2(20, 29)
+
+[node name="AnimatableBody2D" type="Area2D"]
 script = ExtResource("1_i5pdw")
 
 [node name="EnviromentColission" type="CollisionShape2D" parent="."]
@@ -458,6 +461,7 @@ shape = SubResource("RectangleShape2D_figex")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("3_iv5mp")
+flip_h = true
 hframes = 10
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -470,5 +474,12 @@ libraries = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Heavy"]
 position = Vector2(26, 3)
 shape = SubResource("RectangleShape2D_n78j1")
+
+[node name="EnemyHitbox" type="Area2D" parent="."]
+script = ExtResource("6_obxiu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHitbox"]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_wbpvn")
 
 [connection signal="area_entered" from="Heavy" to="." method="HeavyHit" flags=18]
