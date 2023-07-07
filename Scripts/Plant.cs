@@ -20,6 +20,6 @@ public partial class Plant : Node2D
 	public void TakeDamage(int damage)
 	{
 		hp -= damage;
-		Trace.WriteLine(hp);
+		//Trace.WriteLine(hp);
 	}
 }

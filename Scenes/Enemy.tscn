@@ -1,9 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://b0imi271r2atx"]
+[gd_scene load_steps=16 format=3 uid="uid://qby3oyg0v5yp"]
 
-[ext_resource type="Script" path="res://Scripts/Player.cs" id="1_ot84s"]
-[ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_dmbpv"]
-[ext_resource type="Texture2D" uid="uid://dx225gluoj0k6" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/run cycle 48x48.png" id="3_2ch7d"]
-[ext_resource type="Texture2D" uid="uid://bq6hpvuqcbrb1" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Player Punch/Player Punch 64x64.png" id="4_uvytk"]
+[ext_resource type="Script" path="res://Scripts/Enemy.cs" id="1_i5pdw"]
+[ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_w66es"]
+[ext_resource type="Texture2D" uid="uid://catoaw6bjicg" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Enemy Idle 48x48.png" id="3_iv5mp"]
+[ext_resource type="Texture2D" uid="uid://cfrc1fn4ru7u3" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Player Punch/Enemy Punch 64x64.png" id="4_0jh0d"]
+[ext_resource type="Texture2D" uid="uid://ce4dj5k08ib1u" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Enemy run cycle 48x48.png" id="5_qmxe4"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_figex"]
 size = Vector2(19, 5)
@@ -20,7 +21,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("2_dmbpv")]
+"values": [ExtResource("3_iv5mp")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -84,7 +85,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("4_uvytk")]
+"values": [ExtResource("4_0jh0d")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -160,7 +161,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("4_uvytk")]
+"values": [ExtResource("4_0jh0d")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -233,10 +234,10 @@ tracks/0/path = NodePath("Sprite2D:texture")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("2_dmbpv"), ExtResource("2_dmbpv")]
+"values": [ExtResource("3_iv5mp")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -285,10 +286,10 @@ tracks/0/path = NodePath("Sprite2D:texture")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("2_dmbpv"), ExtResource("2_dmbpv")]
+"values": [ExtResource("3_iv5mp")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -341,7 +342,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [ExtResource("3_2ch7d"), ExtResource("2_dmbpv")]
+"values": [ExtResource("5_qmxe4"), ExtResource("2_w66es")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -394,7 +395,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [ExtResource("3_2ch7d"), ExtResource("2_dmbpv")]
+"values": [ExtResource("5_qmxe4"), ExtResource("2_w66es")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -449,14 +450,14 @@ size = Vector2(16, 14)
 
 [node name="AnimatableBody2D" type="AnimatableBody2D"]
 sync_to_physics = false
-script = ExtResource("1_ot84s")
+script = ExtResource("1_i5pdw")
 
 [node name="EnviromentColission" type="CollisionShape2D" parent="."]
 position = Vector2(-0.5, 13.5)
 shape = SubResource("RectangleShape2D_figex")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_dmbpv")
+texture = ExtResource("3_iv5mp")
 hframes = 10
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -470,4 +471,4 @@ libraries = {
 position = Vector2(26, 3)
 shape = SubResource("RectangleShape2D_n78j1")
 
-[connection signal="area_entered" from="Heavy" to="." method="HeavyHit"]
+[connection signal="area_entered" from="Heavy" to="." method="HeavyHit" flags=18]

@@ -3,10 +3,6 @@ using System;
 
 public partial class LevelSelect : Control
 {
-	
-	[Signal]
-    public delegate void SelectHealOrUpgradeEventHandler(bool healSelected);
-	
 	AnimationPlayer animationPlayer;
 	bool selected;
 	bool healSelected;
@@ -18,7 +14,6 @@ public partial class LevelSelect : Control
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
 		animationPlayer.Play("HealBob");
 
-		selected = false;
 		healSelected = true;
 		//SelectHealOrUpgrade += SelectHealOrUpgrade;
 	}
@@ -40,7 +35,6 @@ public partial class LevelSelect : Control
 
 		if (Input.IsActionJustPressed("Light"))
 		{
-			selected = true;
 			if (healSelected)
 			{
 				animationPlayer.Play("HealSelect");
@@ -50,10 +44,5 @@ public partial class LevelSelect : Control
 				animationPlayer.Play("UpgradeSelect");
 			}
 		}
-	}
-
-	public void AnimationDone(string animName)
-	{
-		EmitSignal(SignalName.SelectHealOrUpgrade, healSelected);
 	}
 }

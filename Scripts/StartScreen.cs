@@ -5,9 +5,6 @@ using System.Linq;
 
 public partial class StartScreen : Control
 {
-	
-	[Signal]
-    public delegate void GameStartedEventHandler();
 	AnimationPlayer animationPlayer;
 	bool aboutToStart;
 	// Called when the node enters the scene tree for the first time.
@@ -32,14 +29,6 @@ public partial class StartScreen : Control
 		if (Input.IsActionJustPressed("Escape"))
 		{
 			this.GetTree().Quit();
-		}
-	}
-
-	public void AnimationDone(string animName)
-	{
-		if (aboutToStart)
-		{
-			EmitSignal(SignalName.GameStarted);
 		}
 	}
 }

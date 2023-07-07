@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Diagnostics;
 
-public partial class Player : AnimatableBody2D
+public partial class Enemy : AnimatableBody2D
 {
 	public int speed ;
 	public bool jumping;
@@ -11,6 +11,7 @@ public partial class Player : AnimatableBody2D
 	public bool moving;
 	public bool collidingWithTop;
 	Vector2 velocity;
+	Random rnd;
 
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
@@ -26,6 +27,7 @@ public partial class Player : AnimatableBody2D
 		moving = false;
 		velocity = new Vector2(0,0);
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
+		rnd = new Random();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -38,7 +40,8 @@ public partial class Player : AnimatableBody2D
 
 		// Get the input direction and handle the movement/deceleration.
 		// As good practice, you should replace UI actions with custom gameplay actions.
-		Vector2 direction = Input.GetVector("Left", "Right", "Up", "Down");
+		rnd = new Random();
+		Vector2 direction =  new Vector2((float)rnd.NextDouble() * rnd.NextInt64(-1,1), (float)rnd.NextDouble() * rnd.NextInt64(-1,1));
 
 		// var button = Input.GetActionStrength("Punch");
 		// if(button != 1){
@@ -85,46 +88,46 @@ public partial class Player : AnimatableBody2D
 			attacking = false;
 		}
 
-		// Attacks go here
-		if (!attacking && Input.IsActionJustPressed("Attack"))
-		{
-			var attackType = string.Empty;
-			attacking = true;
-			moving = false;
-			velocity.X = 0;
-			velocity.Y = 0;
+		// // Attacks go here
+		// if (!attacking && Input.IsActionJustPressed("Attack"))
+		// {
+		// 	var attackType = string.Empty;
+		// 	attacking = true;
+		// 	moving = false;
+		// 	velocity.X = 0;
+		// 	velocity.Y = 0;
 
-			if (Input.IsActionJustPressed("Heavy"))
-			{
-				attackType = "heavy";
-			}
-			//else if (Input.IsActionJustPressed("Light"))
-			//{
-			//	attackType = "light";
-			//}
-			else if (Input.IsActionJustPressed("Special"))
-			{
-				attackType = "special";
-			}
+		// 	if (Input.IsActionJustPressed("Heavy"))
+		// 	{
+		// 		attackType = "heavy";
+		// 	}
+		// 	//else if (Input.IsActionJustPressed("Light"))
+		// 	//{
+		// 	//	attackType = "light";
+		// 	//}
+		// 	else if (Input.IsActionJustPressed("Special"))
+		// 	{
+		// 		attackType = "special";
+		// 	}
 
-			if (!string.IsNullOrEmpty(attackType))
-			{
-				animationPlayer.Play($"{attackType}{directionString}");
-			}
-		};
+		// 	if (!string.IsNullOrEmpty(attackType))
+		// 	{
+		// 		animationPlayer.Play($"{attackType}{directionString}");
+		// 	}
+		// };
 
-		// animate if not atttacking
-		if (!attacking)
-		{
-			if (moving)
-			{
-				animationPlayer.Play($"run{directionString}");
-			}
-			else
-			{
-				animationPlayer.Play($"idle{directionString}");
-			}
-		}
+		// // animate if not atttacking
+		// if (!attacking)
+		// {
+		// 	if (moving)
+		// 	{
+		// 		animationPlayer.Play($"run{directionString}");
+		// 	}
+		// 	else
+		// 	{
+		// 		animationPlayer.Play($"idle{directionString}");
+		// 	}
+		// }
 		
 		MoveAndCollide(velocity);
 	}

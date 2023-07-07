@@ -3,8 +3,6 @@ using System;
 
 public partial class Fight : Node2D
 {
-	[Signal]
-    public delegate void FightEndedEventHandler();
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -13,9 +11,21 @@ public partial class Fight : Node2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		if (Input.IsActionJustPressed("Light"))
+	}
+
+	public void TopEnter(Node hit)
+	{
+		if (hit.GetType() == typeof(Player))
 		{
-			EmitSignal(SignalName.FightEnded);
+			((Player)hit).collidingWithTop = true;
+		}
+	}
+
+	public void TopExit(Node hit)
+	{
+		if (hit.GetType() == typeof(Player))
+		{
+			((Player)hit).collidingWithTop = false;
 		}
 	}
 }
