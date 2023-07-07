@@ -16,6 +16,7 @@ public partial class Enemy : AnimatableBody2D
 	int ct = 0;
 	bool decided = false;
 
+
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
 
@@ -53,10 +54,25 @@ public partial class Enemy : AnimatableBody2D
 		// }
 
 		var Player = (Player)rootNode.GetNode("Fight/Player");
+		Vector2 destination = new Vector2(0,0);
+		Vector2 direction = new Vector2(0,0);
 
 		if(!decided){
 			//naj si zbere kaj bo glede na random
-
+			long decision = rng.Next(1,3);
+			if(decision == 1){
+				direction = (Player.Position - this.Position).Normalized();
+				destination = (Player.Position - this.Position).Normalized();
+				decided = true;
+			}
+				//	Idi do playerja pa ga vsipaj
+			if(decision == 2){
+				Vector2 rngVector = new Vector2(rng.Next(100,600),rng.Next(190-350));
+				direction = rngVector;
+				destination = rngVector;
+				decided = true;
+			}
+				//	Idi na random location			
 		}
 
 
@@ -73,9 +89,10 @@ public partial class Enemy : AnimatableBody2D
 
 
 
-		var direction = (Player.Position - this.Position).Normalized();
 
 		// (100-600,190-350)
+
+		// ko pride kam more prit, decided = false
 
 		if (!attacking)
 		{
