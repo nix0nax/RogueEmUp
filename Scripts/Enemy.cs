@@ -50,9 +50,11 @@ public partial class Enemy : AnimatableBody2D
 		// if(button != 1){
 		// 	animatedSprite.Animation = "Punch";
 		// }
-		var Player = (Player)rootNode.GetNode("Player");
 
-		Vector2 direction = (Player.Position - Position).Normalized(); 
+		// Direkt do Playerja
+		var Player = (Player)rootNode.GetNode("Fight/Player");
+		Vector2 direction = (Player.Position - this.Position).Normalized(); 
+
 		if (!attacking)
 		{
 			float slowdown = 1F;
