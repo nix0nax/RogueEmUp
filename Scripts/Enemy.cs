@@ -68,7 +68,7 @@ public partial class Enemy : AnimatableBody2D
 
 		if(!(Math.Abs(Player.Position.X - this.Position.X) > 25 || Math.Abs(Player.Position.Y - this.Position.Y) > 25) ){
 			ct++;
-			Trace.WriteLine($"yee {ct}");
+			//Trace.WriteLine($"yee {ct}");
 		}
 
 

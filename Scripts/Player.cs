@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 public partial class Player : AnimatableBody2D
 {
+	public int health;
 	public int speed ;
 	public bool jumping;
 	public bool attacking;
@@ -15,9 +16,14 @@ public partial class Player : AnimatableBody2D
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
 
+	Node rootNode;
+	Main mainNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		health = 100;
+		rootNode = this.GetTree().Root;
+		mainNode = rootNode.GetNode<Main>("Main");
 		speed = 6;
 		jumping = false;
 		collidingWithTop = false;
@@ -104,7 +110,9 @@ public partial class Player : AnimatableBody2D
 			//}
 			else if (Input.IsActionJustPressed("Special"))
 			{
-				attackType = "special";
+				//attackType = "special";
+				attackType = "heavy";
+				this.TakeDamage(10);
 			}
 
 			if (!string.IsNullOrEmpty(attackType))
@@ -148,6 +156,15 @@ public partial class Player : AnimatableBody2D
 		{
 			((PlantColission)node).TakeDamage(10);
 		}
+	}
+
+	private void TakeDamage(int damage)
+	{
+		//Trace.WriteLine(health);
+		health -= damage;
+		mainNode.playerHealth = health;
+		((Fight)rootNode.GetNode("Fight")).PlayerSetHealth(health);
+		//Trace.WriteLine(health);
 	}
 }
 

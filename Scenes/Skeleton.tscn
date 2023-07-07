@@ -1,6 +1,5 @@
-[gd_scene load_steps=22 format=3 uid="uid://d3yfdjkdwfmjy"]
+[gd_scene load_steps=21 format=3 uid="uid://d3yfdjkdwfmjy"]
 
-[ext_resource type="Script" path="res://Scripts/Player.cs" id="1_g831d"]
 [ext_resource type="Texture2D" uid="uid://dru6olvvalpie" path="res://Resources/SpriteSheets/Placeholder Character/Sprite Sheets/Character Idle 48x48.png" id="2_mp3wa"]
 [ext_resource type="Texture2D" uid="uid://cf2lxoisaiixw" path="res://Resources/SpriteSheets/Skeleton/Skeleton Attack.png" id="3_7roam"]
 [ext_resource type="Texture2D" uid="uid://6p5cwymldknj" path="res://Resources/SpriteSheets/Skeleton/Skeleton Idle.png" id="4_b0ute"]
@@ -632,7 +631,6 @@ size = Vector2(30.5938, 37)
 
 [node name="AnimatableBody2D" type="AnimatableBody2D"]
 sync_to_physics = false
-script = ExtResource("1_g831d")
 
 [node name="EnviromentColission" type="CollisionShape2D" parent="."]
 position = Vector2(11, 16)
