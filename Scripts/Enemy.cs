@@ -11,9 +11,10 @@ public partial class Enemy : AnimatableBody2D
 	public bool moving;
 	public bool collidingWithTop;
 	Vector2 velocity;
-	Random rnd;
-
+	Random rng;
 	Node rootNode;
+	int ct = 0;
+	bool decided = false;
 
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
@@ -31,7 +32,7 @@ public partial class Enemy : AnimatableBody2D
 		moving = false;
 		velocity = new Vector2(0,0);
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
-		rnd = new Random();
+		rng = new Random();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -51,9 +52,30 @@ public partial class Enemy : AnimatableBody2D
 		// 	animatedSprite.Animation = "Punch";
 		// }
 
-		// Direkt do Playerja
 		var Player = (Player)rootNode.GetNode("Fight/Player");
-		Vector2 direction = (Player.Position - this.Position).Normalized(); 
+
+		if(!decided){
+			//naj si zbere kaj bo glede na random
+
+		}
+
+
+		// DECISIONS	
+		// naj gre do playerja
+		// gre na random location
+		// ko je dovol blizu ga naj vsipa
+
+
+		if(!(Math.Abs(Player.Position.X - this.Position.X) > 25 || Math.Abs(Player.Position.Y - this.Position.Y) > 25) ){
+			ct++;
+			Trace.WriteLine($"yee {ct}");
+		}
+
+
+
+		var direction = (Player.Position - this.Position).Normalized();
+
+		// (100-600,190-350)
 
 		if (!attacking)
 		{
