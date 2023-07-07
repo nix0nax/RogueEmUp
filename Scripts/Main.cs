@@ -56,6 +56,7 @@ public partial class Main : Node2D
 						scene = ResourceLoader.Load<PackedScene>("res://Scenes/Fight.tscn").Instantiate();
 						scene.Name = "Fight";
 						var player2 = ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn").Instantiate();
+						player2.Name = "Player";
 						((Node2D)player2).Position = new Vector2(320, 200);
 						scene.AddChild(player2);
 						var plant2 = ResourceLoader.Load<PackedScene>("res://Scenes/Plant.tscn").Instantiate();
@@ -64,6 +65,9 @@ public partial class Main : Node2D
 						var emeny = ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn").Instantiate();
 						((Node2D)emeny).Position = new Vector2(400, 200);
 						scene.AddChild(emeny);
+						var skeleton1 = ResourceLoader.Load<PackedScene>("res://Scenes/Skeleton.tscn").Instantiate();
+						((Node2D)skeleton1).Position = new Vector2(520, 200);
+						scene.AddChild(skeleton1);
 						currentScene = CurrentScene.Fight;
 						break;
 					case CurrentScene.Fight:

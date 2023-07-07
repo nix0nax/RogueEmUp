@@ -457,6 +457,7 @@ shape = SubResource("RectangleShape2D_figex")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_dmbpv")
+flip_h = true
 hframes = 10
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

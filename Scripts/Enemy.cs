@@ -13,12 +13,16 @@ public partial class Enemy : AnimatableBody2D
 	Vector2 velocity;
 	Random rnd;
 
+	Node rootNode;
+
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+
+		rootNode = this.GetTree().Root;
 		speed = 6;
 		jumping = false;
 		collidingWithTop = false;
@@ -40,14 +44,15 @@ public partial class Enemy : AnimatableBody2D
 
 		// Get the input direction and handle the movement/deceleration.
 		// As good practice, you should replace UI actions with custom gameplay actions.
-		rnd = new Random();
-		Vector2 direction =  new Vector2((float)rnd.NextDouble() * rnd.NextInt64(-1,1), (float)rnd.NextDouble() * rnd.NextInt64(-1,1));
-
+		// rnd = new Random();
+		// Vector2 direction =  new Vector2((float)rnd.NextDouble() * rnd.NextInt64(-1,1), (float)rnd.NextDouble() * rnd.NextInt64(-1,1));
 		// var button = Input.GetActionStrength("Punch");
 		// if(button != 1){
 		// 	animatedSprite.Animation = "Punch";
 		// }
+		var Player = (Player)rootNode.GetNode("Player");
 
+		Vector2 direction = (Player.Position - Position).Normalized(); 
 		if (!attacking)
 		{
 			float slowdown = 1F;
