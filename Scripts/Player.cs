@@ -69,6 +69,12 @@ public partial class Player : AnimatableBody2D
 			hurt = false;
 		}
 
+		// no spamming allowed >:(
+		if (attacking && !canComboTimer && Input.IsActionJustPressed("Attack"))
+		{
+			canComboInput = false;
+		}
+
 		// If paused and can't combo, literally do nothing
 		if ((!canComboTimer || !canComboInput) && damagePaused)
 		{
@@ -82,11 +88,6 @@ public partial class Player : AnimatableBody2D
 			canComboInput = true;
 		}
 		
-		if (attacking && !canComboTimer && Input.IsActionJustPressed("Attack"))
-		{
-			canComboInput = false;
-		}
-
 		// Attacks go here
 		if ((!attacking || (canComboTimer && canComboInput)) && Input.IsActionJustPressed("Attack"))
 		{
@@ -178,18 +179,6 @@ public partial class Player : AnimatableBody2D
 		MoveAndCollide(velocity);
 	}
 
-	//private void UpdateAnimationParameters(){
-	//	animationTree.Set("parameters/isIdle",true);
-//
-	//}
-
-	// private void OnPunchHitAreaEntered(Area2D area)
-	// {	
-	// 	if(area.IsInGroup(new StringName("HurtBox"))){
-			
-	// 	}
-	// }
-
 	private void HeavyHit(Area2D node)
 	{
 		if (node.GetType() == typeof(EnemyHitbox))
@@ -216,16 +205,13 @@ public partial class Player : AnimatableBody2D
 		{
 			EnemyHitbox enemyNode = (EnemyHitbox)node;
 			enemyNode.TakeDamage(heavyDamage, ((Enemy)enemyNode.GetParent()).Position.X < this.Position.X ? true : false);
-			comboTimer.Start(0.2);
-			canComboTimer = true;
-			mainNode.HitOccured(lightDamageTimer);
+			((Enemy)enemyNode.GetParent()).damagePaused = true;
+			((Enemy)enemyNode.GetParent()).damageTimer.Start(lightDamageTimer);
 		}
 
 		if (node.GetType() == typeof(PlantColission))
 		{
 			((PlantColission)node).TakeDamage(lightDamage);
-			comboTimer.Start(0.2);
-			canComboTimer = true;
 			mainNode.HitOccured(lightDamageTimer);
 		}
 	}

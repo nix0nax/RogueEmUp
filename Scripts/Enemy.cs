@@ -12,6 +12,8 @@ public partial class Enemy : Area2D
 	public string directionString;
 	public bool moving;
 	public bool collidingWithTop;
+	public bool chasingPlayer = false;
+	public int directionPlayer = -1;
 	public int heavyDamage = 10;
 	public float heavyDamageTimer = 0.4F;
 	Vector2 velocity;
@@ -26,6 +28,7 @@ public partial class Enemy : Area2D
 	int marginY = 10;
 
 	Player player;
+	public Timer damageTimer;
 
 	int health;
 
@@ -45,7 +48,8 @@ public partial class Enemy : Area2D
 
 		// Get DamageTimer and set event to it
 		damagePaused = false;
-		this.GetNode<Timer>("DamageTimer").Timeout += () => damagePaused = false;
+		damageTimer = this.GetNode<Timer>("DamageTimer");
+		damageTimer.Timeout += () => damagePaused = false;
 
 		hurt = false;
 		decided = false;
@@ -79,24 +83,31 @@ public partial class Enemy : Area2D
 
 		if(!decided){
 			//naj si zbere kaj bo glede na random
-			long decision = rng.Next(1,3);
+			long decision = rng.Next(0,101);
 
-			switch(decision)
+			if (decision < 50)
 			{
-				case 1:
 					//	Idi do playerja pa ga vsipaj
-					direction = (player.Position - this.Position).Normalized();
-					destination = new Vector2(player.Position.X, player.Position.Y);
-					break;
-				case 2:
+					directionPlayer = rng.Next(0,2) == 1 ? -1 : 1;
+					chasingPlayer = true;
+			}
+			else
+			{
 					//	Idi na random location	
 					Vector2 rngVector = new Vector2(rng.Next(100,600),rng.Next(190,350));
 					destination =  rngVector;
 					direction = (destination - this.Position).Normalized();;
-					break;
+
 			}
 
 			decided = true;
+		}
+
+		// if chasing player, update where to go every frame
+		if (chasingPlayer)
+		{
+			destination = new Vector2(player.Position.X + (25 * directionPlayer), player.Position.Y);
+			direction = (destination - this.Position).Normalized();
 		}
 
 		// DECISIONS	
@@ -105,8 +116,9 @@ public partial class Enemy : Area2D
 		// ko je dovol blizu ga naj vsipa
 
 		var distance = destination - Position;
-		if(Math.Abs(distance.X) < marginXHigh && Math.Abs(distance.Y) < marginXHigh){
+		if(Math.Abs(distance.X) < marginXHigh && Math.Abs(distance.Y) < marginY){
 			decided = false;
+			chasingPlayer = false;
 		}
 
 		// (100-600,190-350)
