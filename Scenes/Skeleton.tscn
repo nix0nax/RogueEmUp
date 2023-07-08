@@ -651,5 +651,3 @@ libraries = {
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Heavy"]
 position = Vector2(-6.70313, 1.5)
 shape = SubResource("RectangleShape2D_n78j1")
-
-[connection signal="area_entered" from="Heavy" to="." method="HeavyHit"]

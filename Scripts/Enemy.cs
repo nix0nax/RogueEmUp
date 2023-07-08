@@ -4,12 +4,16 @@ using System.Diagnostics;
 
 public partial class Enemy : Area2D
 {
-	public int speed = 6 ;
+	public int speed = 4;
+	public bool damagePaused;
+	public bool hurt;
 	public bool jumping;
 	public bool attacking;
 	public string directionString;
 	public bool moving;
 	public bool collidingWithTop;
+	public int heavyDamage = 10;
+	public float heavyDamageTimer = 0.4F;
 	Vector2 velocity;
 	Random rng;
 	Node rootNode;
@@ -27,15 +31,23 @@ public partial class Enemy : Area2D
 
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
+	Main mainNode;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		rootNode = this.GetTree().Root;
+		mainNode = rootNode.GetNode<Main>("Main");
+
 		player = (Player)rootNode.GetNode("Fight/Player");
 		rng = new Random();
 		velocity = new Vector2(0,0);
 
+		// Get DamageTimer and set event to it
+		damagePaused = false;
+		this.GetNode<Timer>("DamageTimer").Timeout += () => damagePaused = false;
+
+		hurt = false;
 		decided = false;
 		jumping = false;
 		collidingWithTop = false;
@@ -54,14 +66,16 @@ public partial class Enemy : Area2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (hurt && !animationPlayer.IsPlaying())
+		{
+			hurt = false;
+		}
 
-		// rnd = new Random();
-		// Vector2 direction =  new Vector2((float)rnd.NextDouble() * rnd.NextInt64(-1,1), (float)rnd.NextDouble() * rnd.NextInt64(-1,1));
-		// var button = Input.GetActionStrength("Punch");
-		// if(button != 1){
-		// 	animatedSprite.Animation = "Punch";
-		// }
-
+		// If paused, literally do nothing 
+		if (damagePaused)
+		{
+			return;
+		}
 
 		if(!decided){
 			//naj si zbere kaj bo glede na random
@@ -174,7 +188,7 @@ public partial class Enemy : Area2D
 		};
 
 		// animate if not atttacking
-		if (!attacking)
+		if (!attacking && !hurt)
 		{
 			if (moving)
 			{
@@ -203,15 +217,20 @@ public partial class Enemy : Area2D
 
 	private void HeavyHit(Node2D node)
 	{
-		if (node.GetType() == typeof(PlantColission))
+		if (node.GetType() == typeof(PlayerHitbox))
 		{
-			((PlantColission)node).TakeDamage(10);
+			PlayerHitbox playerNode = (PlayerHitbox)node;
+			playerNode.TakeDamage(heavyDamage, ((Player)playerNode.GetParent()).Position.X < this.Position.X ? true : false);
+			mainNode.HitOccured(heavyDamageTimer);
 		}
 	}
 
-	public void TakeDamage(int damage)
+	public void TakeDamage(int damage, bool facingRight)
 	{
 		health -= damage;
+		hurt = true;
+		directionString = facingRight ? "_right" : "_left";
+		animationPlayer.Play($"hurt{directionString}");
 	}
 }
 

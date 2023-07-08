@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 public partial class Main : Node2D
 {
@@ -26,9 +27,12 @@ public partial class Main : Node2D
 	public int playerHealth;
 	public int highScore;
 
+	List<Timer> damageTimersToStart;
+
 	int test = 1;
 	public override void _Ready()
 	{
+		damageTimersToStart = new List<Timer>();
 		playerHealth = 100;
 		rng = new Random();
 		rootNode = this.GetTree().Root;
@@ -42,7 +46,6 @@ public partial class Main : Node2D
 	{
 		if (changeScene)
 		{
-			//Trace.WriteLine("yo");
 			if (animationToWaitFor == null || !animationToWaitFor.IsPlaying())
 			{
 				Node scene = null;
@@ -92,7 +95,7 @@ public partial class Main : Node2D
 					}
 					break;
 				case CurrentScene.Fight:
-					if (Input.IsActionJustPressed("Light"))
+					if (Input.IsActionJustPressed("Special"))
 					{
 						changeScene = true;
 						animationToWaitFor = null;
@@ -106,22 +109,36 @@ public partial class Main : Node2D
 
 	public void GenerateFight()
 	{
+		// Clear damage timers you have to set for stagger effect on hit
+		damageTimersToStart.Clear();
+
+		// Create Fight scene
 		Node scene = ResourceLoader.Load<PackedScene>("res://Scenes/Fight.tscn").Instantiate();
 		scene.Name = "Fight";
+
+		// Make player
 		var player = ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn").Instantiate();
 		player.Name = "Player";
 		((Node2D)player).Position = new Vector2(320, 200);
 		scene.AddChild(player);
+		damageTimersToStart.Add(player.GetNode<Timer>("DamageTimer"));
+
+		// get total number of enemies to spawn and choose how many of which
 		numOfEnemies = rng.Next(1,7);
 		var numOfskeletons = rng.Next(1,4);
 		var numOfEmeny = numOfEnemies - numOfskeletons;
+
+		// Spawn emeny enemy
 		for (int i = 0; i < numOfEmeny; i++)
 		{
 			var emeny = ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn").Instantiate();
 			((Node2D)emeny).Position = new Vector2(rng.Next(floorx), rng.Next(floorylow, flooryhi));
 			scene.AddChild(emeny);
+			damageTimersToStart.Add(emeny.GetNode<Timer>("DamageTimer"));
 		}
 
+
+		// Spawn skeleton enemey
 		for (int i = 0; i < numOfskeletons; i++)
 		{
 			var skeleton = ResourceLoader.Load<PackedScene>("res://Scenes/Skeleton.tscn").Instantiate();
@@ -131,5 +148,13 @@ public partial class Main : Node2D
 
 		
 		rootNode.AddChild(scene);
+	}
+
+	public void HitOccured(float time)
+	{
+		foreach (var timer in damageTimersToStart)
+		{
+			timer.Start(time);
+		}
 	}
 }

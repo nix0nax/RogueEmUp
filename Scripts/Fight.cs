@@ -37,7 +37,6 @@ public partial class Fight : Node2D
 	public void PlayerSetHealth(int setHealthTo)
 	{
 		var healthNode = this.GetNode<Sprite2D>("UI/Health");
-		Trace.WriteLine(setHealthTo);
 		playerHealth = setHealthTo;
 		if (playerHealth < 1)
 		{

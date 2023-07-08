@@ -4,42 +4,51 @@ using System.Diagnostics;
 
 public partial class Player : AnimatableBody2D
 {
-	public int health;
-	public int speed ;
-	public bool jumping;
-	public bool attacking;
+	public int health = 100;
+	public int speed = 4;
+	public int heavyDamage = 15;
+	public float heavyDamageTimer = 0.4F;
+	public int lightDamage = 5;
+	public float lightDamageTimer = 0.1F;
+
 	public bool canComboTimer;
 	public bool canComboInput;
+	public bool damagePaused;
+	
+	public bool jumping;
+	public bool attacking;
 	public string directionString;
 	public bool moving;
+	public bool hurt;
 	public bool collidingWithTop;
 	Vector2 velocity;
 
+	// Get any nodes needed for logic
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
-
 	Timer comboTimer;
 	Node rootNode;
 	Main mainNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		// Create combo timer (I could have done most of this this outside of code lmao)
 		comboTimer = new Timer();
 		comboTimer.OneShot = true;
 		comboTimer.Timeout += () =>
 		{
 			canComboTimer = false;
-			Trace.WriteLine(canComboInput);
 		};
 		canComboTimer = false;
 		canComboInput = true;
 		this.AddChild(comboTimer);
 
-		health = 100;
+		damagePaused = false;
+
 		rootNode = this.GetTree().Root;
 		mainNode = rootNode.GetNode<Main>("Main");
-		speed = 6;
 		jumping = false;
+		hurt = false;
 		collidingWithTop = false;
 		attacking = false;
 		directionString = "_right";
@@ -55,15 +64,68 @@ public partial class Player : AnimatableBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (hurt && !animationPlayer.IsPlaying())
+		{
+			hurt = false;
+		}
 
-		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
+		// If paused and can't combo, literally do nothing
+		if ((!canComboTimer || !canComboInput) && damagePaused)
+		{
+			return;
+		}
+
+		// process attacks FIRST (this is to allow attacking during damage pause)
+		if (attacking && !damagePaused && !animationPlayer.IsPlaying())
+		{
+			attacking = false;
+			canComboInput = true;
+		}
+		
+		if (attacking && !canComboTimer && Input.IsActionJustPressed("Attack"))
+		{
+			canComboInput = false;
+		}
+
+		// Attacks go here
+		if ((!attacking || (canComboTimer && canComboInput)) && Input.IsActionJustPressed("Attack"))
+		{
+			var attackType = string.Empty;
+			attacking = true;
+			canComboTimer = false;
+			moving = false;
+			velocity.X = 0;
+			velocity.Y = 0;
+
+			if (Input.IsActionJustPressed("Heavy"))
+			{
+				attackType = "heavy";
+			}
+			else if (Input.IsActionJustPressed("Light"))
+			{
+				attackType = "light";
+			}
+			else if (Input.IsActionJustPressed("Special"))
+			{
+				//attackType = "special";
+				attackType = "heavy";
+			}
+
+			if (!string.IsNullOrEmpty(attackType))
+			{
+				animationPlayer.Stop();
+				animationPlayer.Play($"{attackType}{directionString}");
+			}
+		};
+
+		// If paused, literally do nothing after getting punch inputs
+		if (damagePaused)
+		{
+			return;
+		}
+
+		// Movement
 		Vector2 direction = Input.GetVector("Left", "Right", "Up", "Down");
-
-		// var button = Input.GetActionStrength("Punch");
-		// if(button != 1){
-		// 	animatedSprite.Animation = "Punch";
-		// }
 
 		if (!attacking)
 		{
@@ -100,51 +162,8 @@ public partial class Player : AnimatableBody2D
 			}
 		}
 
-		if (attacking && !animationPlayer.IsPlaying())
-		{
-			attacking = false;
-			canComboInput = true;
-		}
-		
-		if (attacking && !canComboTimer && Input.IsActionJustPressed("Attack"))
-		{
-			canComboInput = false;
-		}
-
-		// Attacks go here
-		if ((!attacking || (canComboTimer && canComboInput)) && Input.IsActionJustPressed("Attack"))
-		{
-			var attackType = string.Empty;
-			attacking = true;
-			canComboTimer = false;
-			moving = false;
-			velocity.X = 0;
-			velocity.Y = 0;
-
-			if (Input.IsActionJustPressed("Heavy"))
-			{
-				attackType = "heavy";
-			}
-			//else if (Input.IsActionJustPressed("Light"))
-			//{
-			//	attackType = "light";
-			//}
-			else if (Input.IsActionJustPressed("Special"))
-			{
-				//attackType = "special";
-				attackType = "heavy";
-				this.TakeDamage(10);
-			}
-
-			if (!string.IsNullOrEmpty(attackType))
-			{
-				animationPlayer.Stop();
-				animationPlayer.Play($"{attackType}{directionString}");
-			}
-		};
-
-		// animate if not atttacking
-		if (!attacking)
+		// animate if not atttacking or hurt
+		if (!attacking && !hurt)
 		{
 			if (moving)
 			{
@@ -164,38 +183,62 @@ public partial class Player : AnimatableBody2D
 //
 	//}
 
-	private void OnPunchHitAreaEntered(Area2D area)
-	{	
-		if(area.IsInGroup(new StringName("HurtBox"))){
+	// private void OnPunchHitAreaEntered(Area2D area)
+	// {	
+	// 	if(area.IsInGroup(new StringName("HurtBox"))){
 			
-		}
-	}
+	// 	}
+	// }
 
-	private void HeavyHit(Node2D node)
+	private void HeavyHit(Area2D node)
 	{
-		//Trace.WriteLine(node.GetType());
 		if (node.GetType() == typeof(EnemyHitbox))
 		{
-			((EnemyHitbox)node).TakeDamage(10);
-			comboTimer.Start(0.1);
+			EnemyHitbox enemyNode = (EnemyHitbox)node;
+			enemyNode.TakeDamage(heavyDamage, enemyNode.Position.X < this.Position.X ? true : false);
+			comboTimer.Start(0.2);
 			canComboTimer = true;
+			mainNode.HitOccured(heavyDamageTimer);
 		}
 
 		if (node.GetType() == typeof(PlantColission))
 		{
-			((PlantColission)node).TakeDamage(10);
-			comboTimer.Start(0.1);
+			((PlantColission)node).TakeDamage(heavyDamage);
+			comboTimer.Start(0.2);
 			canComboTimer = true;
+			mainNode.HitOccured(heavyDamageTimer);
 		}
 	}
 
-	private void TakeDamage(int damage)
+	private void LightHit(Area2D node)
 	{
-		//Trace.WriteLine(health);
+		if (node.GetType() == typeof(EnemyHitbox))
+		{
+			EnemyHitbox enemyNode = (EnemyHitbox)node;
+			enemyNode.TakeDamage(heavyDamage, ((Enemy)enemyNode.GetParent()).Position.X < this.Position.X ? true : false);
+			comboTimer.Start(0.2);
+			canComboTimer = true;
+			mainNode.HitOccured(lightDamageTimer);
+		}
+
+		if (node.GetType() == typeof(PlantColission))
+		{
+			((PlantColission)node).TakeDamage(lightDamage);
+			comboTimer.Start(0.2);
+			canComboTimer = true;
+			mainNode.HitOccured(lightDamageTimer);
+		}
+	}
+
+	public void TakeDamage(int damage, bool facingRight)
+	{
+		// Ouch oof owie ouch I'm calling the take damage function
 		health -= damage;
 		mainNode.playerHealth = health;
 		((Fight)rootNode.GetNode("Fight")).PlayerSetHealth(health);
-		//Trace.WriteLine(health);
+		hurt = true;
+		directionString = facingRight ? "_right" : "_left";
+		animationPlayer.Play($"hurt{directionString}");
 	}
 }
 
