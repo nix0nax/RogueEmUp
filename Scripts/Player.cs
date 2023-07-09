@@ -29,6 +29,7 @@ public partial class Player : AnimatableBody2D
 	Timer comboTimer;
 	Node rootNode;
 	Main mainNode;
+	Player player;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -55,6 +56,8 @@ public partial class Player : AnimatableBody2D
 		moving = false;
 		velocity = new Vector2(0,0);
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
+		((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(0);
+		player = (Player)rootNode.GetNode("Fight/Player");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -64,6 +67,7 @@ public partial class Player : AnimatableBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+
 		if (hurt && !animationPlayer.IsPlaying())
 		{
 			hurt = false;
@@ -188,6 +192,7 @@ public partial class Player : AnimatableBody2D
 			comboTimer.Start(0.2);
 			canComboTimer = true;
 			mainNode.HitOccured(heavyDamageTimer);
+			((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(10);
 		}
 
 		if (node.GetType() == typeof(PlantColission))
@@ -207,6 +212,7 @@ public partial class Player : AnimatableBody2D
 			enemyNode.TakeDamage(heavyDamage, ((Enemy)enemyNode.GetParent()).Position.X < this.Position.X ? true : false);
 			((Enemy)enemyNode.GetParent()).damagePaused = true;
 			((Enemy)enemyNode.GetParent()).damageTimer.Start(lightDamageTimer);
+			((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(10);
 		}
 
 		if (node.GetType() == typeof(PlantColission))
@@ -225,6 +231,7 @@ public partial class Player : AnimatableBody2D
 		hurt = true;
 		directionString = facingRight ? "_right" : "_left";
 		animationPlayer.Play($"hurt{directionString}");
+		((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(-15);
 	}
 }
 
