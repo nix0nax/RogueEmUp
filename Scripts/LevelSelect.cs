@@ -5,7 +5,7 @@ public partial class LevelSelect : Control
 {
 	AnimationPlayer animationPlayer;
 	bool selected;
-	bool healSelected;
+	public bool healSelected;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()

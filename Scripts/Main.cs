@@ -13,6 +13,7 @@ public partial class Main : Node2D
 		Start,
 		Fight,
 		LevelSelect,
+		UpgradeSelect,
 	}
 
 	CurrentScene currentScene;
@@ -24,16 +25,21 @@ public partial class Main : Node2D
 	int floorylow = 185;
 	int flooryhi = 350;
 
+	int level;
+
 	public int numOfEnemies;
 	public int playerHealth;
 	public int highScore;
 
-	List<Timer> damageTimersToStart;
+	List<Upgrade> playerUpgrade;
+	bool healSelected = false;
+
+	public List<Enemy> enemies;
 
 	int test = 1;
 	public override void _Ready()
 	{
-		damageTimersToStart = new List<Timer>();
+		enemies = new List<Enemy>();
 		playerHealth = 100;
 		rng = new Random();
 		rootNode = this.GetTree().Root;
@@ -41,6 +47,8 @@ public partial class Main : Node2D
 		goToScene = CurrentScene.Fight;
 		animationToWaitFor = this.GetNode("StartScreen").GetNode<AnimationPlayer>("AnimationPlayer");
 		numOfEnemies = 0;
+		playerUpgrade = new List<Upgrade>();
+		level = 1;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -48,7 +56,7 @@ public partial class Main : Node2D
 	{
 		if (changeScene)
 		{
-			if (animationToWaitFor == null || !animationToWaitFor.IsPlaying())
+			if (animationToWaitFor == null || (!animationToWaitFor.IsPlaying() && animationToWaitFor.CurrentAnimationLength == animationToWaitFor.CurrentAnimationPosition))
 			{
 				Node scene = null;
 				Node remove = null;
@@ -56,25 +64,40 @@ public partial class Main : Node2D
 				{
 					case CurrentScene.Start:
 						remove = this.GetNode("StartScreen");
+						break;
+					case CurrentScene.LevelSelect:
+						remove = rootNode.GetNode("LevelSelect");
+						break;
+					case CurrentScene.Fight:
+						remove = rootNode.GetNode("Fight");
+						break;
+					case CurrentScene.UpgradeSelect:
+						remove = rootNode.GetNode("UpgradeSelect");
+						break;
+				}
+
+				remove.Free();
+
+				switch (goToScene)
+				{
+					case CurrentScene.Fight:
 						this.GenerateFight();
 						currentScene = CurrentScene.Fight;
 						break;
 					case CurrentScene.LevelSelect:
-						remove = rootNode.GetNode("LevelSelect");
-						this.GenerateFight();
-						currentScene = CurrentScene.Fight;
-						break;
-					case CurrentScene.Fight:
-						remove = rootNode.GetNode("Fight");
 						scene = ResourceLoader.Load<PackedScene>("res://Scenes/LevelSelect.tscn").Instantiate();
 						scene.Name = "LevelSelect";
 						rootNode.AddChild(scene);
-						
 						currentScene = CurrentScene.LevelSelect;
+						break;
+					case CurrentScene.UpgradeSelect:
+						scene = ResourceLoader.Load<PackedScene>("res://Scenes/UpgradeSelect.tscn").Instantiate();
+						scene.Name = "UpgradeSelect";
+						rootNode.AddChild(scene);
+						currentScene = CurrentScene.UpgradeSelect;
 						break;
 				}
 
-				remove.QueueFree();
 				changeScene = false;
 			}
 		}
@@ -85,6 +108,7 @@ public partial class Main : Node2D
 				case CurrentScene.Start:
 					if (Input.IsActionJustPressed("Light"))
 					{
+						goToScene = CurrentScene.Fight;
 						changeScene = true;
 						animationToWaitFor = this.GetNode("StartScreen").GetNode<AnimationPlayer>("AnimationPlayer");
 					}
@@ -92,15 +116,44 @@ public partial class Main : Node2D
 				case CurrentScene.LevelSelect:
 					if (Input.IsActionJustPressed("Light"))
 					{
+						var levelNode = (LevelSelect)rootNode.GetNode("LevelSelect");
+						if (levelNode.healSelected)
+						{
+							healSelected = true;
+							goToScene = CurrentScene.Fight;
+						}
+						else
+						{
+							healSelected = false;
+							goToScene = CurrentScene.UpgradeSelect;
+						}
+						animationToWaitFor = levelNode.GetNode<AnimationPlayer>("AnimationPlayer");
 						changeScene = true;
-						animationToWaitFor = rootNode.GetNode("LevelSelect").GetNode<AnimationPlayer>("AnimationPlayer");
 					}
 					break;
 				case CurrentScene.Fight:
-					if (Input.IsActionJustPressed("Special"))
+					if (numOfEnemies < 1)
 					{
+						goToScene = CurrentScene.LevelSelect;
 						changeScene = true;
 						animationToWaitFor = null;
+					}
+					else if (playerHealth <= 0 && Input.IsActionJustPressed("Light"))
+					{
+						goToScene = CurrentScene.Fight;
+						playerUpgrade.Clear();
+						playerHealth = 100;
+						changeScene = true;
+						level = 1;
+						animationToWaitFor = rootNode.GetNode("Fight/Player").GetNode<AnimationPlayer>("AnimationPlayer");
+					}
+					break;
+				case CurrentScene.UpgradeSelect:
+					if (Input.IsActionJustPressed("Light"))
+					{
+						goToScene = CurrentScene.Fight;
+						changeScene = true;
+						animationToWaitFor = rootNode.GetNode("UpgradeSelect").GetNode<AnimationPlayer>("AnimationPlayer");
 					}
 					break;
 			}
@@ -112,23 +165,21 @@ public partial class Main : Node2D
 	public void GenerateFight()
 	{
 		// Clear damage timers you have to set for stagger effect on hit
-		damageTimersToStart.Clear();
+		enemies.Clear();
 
 		// Create Fight scene
 		Node scene = ResourceLoader.Load<PackedScene>("res://Scenes/Fight.tscn").Instantiate();
 		scene.Name = "Fight";
 
 		// Make player
-		var player = ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn").Instantiate();
-		player.Name = "Player";
-		((Node2D)player).Position = new Vector2(320, 200);
+		var player = GeneratePlayer((Fight)scene);
 		scene.AddChild(player);
-		damageTimersToStart.Add(player.GetNode<Timer>("DamageTimer"));
+		
 
 		// get total number of enemies to spawn and choose how many of which
-		numOfEnemies = rng.Next(1,7);
-		var numOfskeletons = rng.Next(1,4);
-		var numOfEmeny = numOfEnemies - numOfskeletons;
+		numOfEnemies = rng.Next(1,2 * level);
+		//var numOfskeletons = rng.Next(1,4);
+		var numOfEmeny = numOfEnemies;// - numOfskeletons;
 
 		// Spawn emeny enemy
 		for (int i = 0; i < numOfEmeny; i++)
@@ -136,27 +187,105 @@ public partial class Main : Node2D
 			var emeny = ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn").Instantiate();
 			((Node2D)emeny).Position = new Vector2(rng.Next(floorx), rng.Next(floorylow, flooryhi));
 			scene.AddChild(emeny);
-			damageTimersToStart.Add(emeny.GetNode<Timer>("DamageTimer"));
+			enemies.Add((Enemy)emeny);
 		}
 
+		((Fight)scene).SetLevel(level);
+		level++;
 
-		// Spawn skeleton enemey
-		for (int i = 0; i < numOfskeletons; i++)
-		{
-			var skeleton = ResourceLoader.Load<PackedScene>("res://Scenes/Skeleton.tscn").Instantiate();
-			((Node2D)skeleton).Position = new Vector2(rng.Next(floorx), rng.Next(floorylow, flooryhi));
-			scene.AddChild(skeleton);
-		}
+        // // Spawn skeleton enemey
+        // for (int i = 0; i < numOfskeletons; i++)
+        // {
+        //     var skeleton = ResourceLoader.Load<PackedScene>("res://Scenes/Skeleton.tscn").Instantiate();
+        //     ((Node2D)skeleton).Position = new Vector2(rng.Next(floorx), rng.Next(floorylow, flooryhi));
+        //     scene.AddChild(skeleton);
+        // }
 
 		
 		rootNode.AddChild(scene);
 	}
 
+	public Player GeneratePlayer(Fight fightScene)
+	{
+		var player = (Player)ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn").Instantiate();
+		player.Name = "Player";
+		((Node2D)player).Position = new Vector2(320, 200);
+
+		player.heavyDamage = 15;
+		player.lightDamage = 5;
+		player.heavyAttackSpeed = 1F;
+		player.speed = 4;
+		player.maxHealth = 100;
+
+		// upgrades
+		foreach (var upgrade in playerUpgrade)
+		{
+			switch(upgrade.UpgradeType)
+			{
+				case "Damage":
+					player.heavyDamage += 5 * upgrade.Amount;
+					player.lightDamage += 5 * upgrade.Amount;
+					break;
+				case "AttackSpeed":
+					player.heavyAttackSpeed += 0.2F * upgrade.Amount;
+					break;
+				case "MaxHp":
+					player.maxHealth += 50 * upgrade.Amount;
+					break;
+				case "PlayerSpeed":
+					player.speed += 2 * upgrade.Amount;
+					break;
+			}
+		}
+
+		if (healSelected)
+		{
+			playerHealth = player.maxHealth;
+		}
+
+		player.health = playerHealth;
+		fightScene.playerHealth = playerHealth;
+		fightScene.playerMaxHealth = player.maxHealth;
+
+		return (Player)player;
+	}
+
 	public void HitOccured(float time)
 	{
-		foreach (var timer in damageTimersToStart)
+		var playerTimer = rootNode.GetNode<Timer>("Fight/Player/DamageTimer");
+		playerTimer.Start(time);
+		foreach (var enemy in enemies)
 		{
+			var timer = enemy.GetNode<Timer>("DamageTimer");
 			timer.Start(time);
 		}
 	}
+
+	public void PlayerUpgrade(string upgradeToAdd)
+	{
+		var upgrade = playerUpgrade.FirstOrDefault(x => x.UpgradeType == upgradeToAdd);
+		if (upgrade == null)
+		{
+			playerUpgrade.Add(new Upgrade
+			{
+				UpgradeType = upgradeToAdd,
+				Amount = 1,
+			});
+		}
+		else
+		{
+			upgrade.Amount++;
+		}
+
+		if (upgradeToAdd == "MaxHp")
+		{
+			playerHealth += 50;
+		}
+	}
+}
+
+public class Upgrade
+{
+	public string UpgradeType {get;set;}
+	public int Amount {get;set;}
 }

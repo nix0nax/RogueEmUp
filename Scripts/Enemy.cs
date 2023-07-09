@@ -5,6 +5,7 @@ using System.Diagnostics;
 public partial class Enemy : Area2D
 {
 	public int speed = 4;
+	public bool thinking;
 	public bool damagePaused;
 	public bool hurt;
 	public bool jumping;
@@ -30,6 +31,7 @@ public partial class Enemy : Area2D
 	Player player;
 	ulong playerId;
 	public Timer damageTimer;
+	public Timer thinkingTimer;
 
 	int health;
 
@@ -53,6 +55,13 @@ public partial class Enemy : Area2D
 		damageTimer = this.GetNode<Timer>("DamageTimer");
 		damageTimer.Timeout += () => damagePaused = false;
 
+		
+		// Get ThinkingTimer and set event to it
+		thinking = true;
+		thinkingTimer = this.GetNode<Timer>("ThinkingTimer");
+		thinkingTimer.Timeout += () => thinking = false;
+		thinkingTimer.Start(0.5);
+
 		hurt = false;
 		decided = false;
 		jumping = false;
@@ -62,7 +71,7 @@ public partial class Enemy : Area2D
 		moving = false;
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
 
-		health = 100;
+		health = 50;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -72,12 +81,15 @@ public partial class Enemy : Area2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (hurt && !animationPlayer.IsPlaying())
+		if (hurt && !animationPlayer.IsPlaying() && animationPlayer.CurrentAnimationLength == animationPlayer.CurrentAnimationPosition)
 		{
 			hurt = false;
 			if (health < 0)
 			{
-				((Main)rootNode.GetNode("Main")).numOfEnemies -= 1;
+				Main mainNode = (Main)rootNode.GetNode("Main");
+				mainNode.numOfEnemies -= 1;
+				mainNode.enemies.Remove(this);
+
 				this.QueueFree();
 			}
 		}
@@ -115,6 +127,12 @@ public partial class Enemy : Area2D
 			decided = true;
 		}
 
+		if (thinking)
+		{
+			animationPlayer.Play($"idle{directionString}");
+			return;
+		}
+
 		// if chasing player, update where to go every frame
 		if (chasingPlayer)
 		{
@@ -128,9 +146,13 @@ public partial class Enemy : Area2D
 		// ko je dovol blizu ga naj vsipa
 
 		var distance = destination - Position;
-		if(Math.Abs(distance.X) < marginXHigh && Math.Abs(distance.Y) < marginY){
+		if(Math.Abs(distance.X) < marginXLow && Math.Abs(distance.Y) < marginY && !attacking)
+		{
 			decided = false;
 			chasingPlayer = false;
+			thinking = true;
+			float nextFloat = (float)rng.NextDouble();
+			thinkingTimer.Start(nextFloat);
 		}
 
 		// (100-600,190-350)
@@ -172,20 +194,24 @@ public partial class Enemy : Area2D
 			}
 		}
 
-		if (attacking && !animationPlayer.IsPlaying())
+		if (attacking && !animationPlayer.IsPlaying() &&  animationPlayer.CurrentAnimationLength == animationPlayer.CurrentAnimationPosition)
 		{
 			attacking = false;
 		}
 
 		var distanceToPlayer = ((Fight)this.GetParent()).gameOver ? Vector2.Zero : player.Position - Position;
 		// Attacks go here
-		if (!attacking && Math.Abs(distanceToPlayer.X) < marginXHigh && Math.Abs(distanceToPlayer.X) > marginXLow && Math.Abs(distanceToPlayer.Y) < marginY)
+		if (!attacking && Math.Abs(distanceToPlayer.X) < marginXHigh && Math.Abs(distanceToPlayer.X) > marginXLow && Math.Abs(distanceToPlayer.Y) < marginY && !thinking)
 		{
 			var attackType = string.Empty;
 			attacking = true;
 			moving = false;
 			velocity.X = 0;
 			velocity.Y = 0;
+
+			// make new decision after attack
+			decided = false;
+			chasingPlayer = false;
 			
 			long decision = rng.Next(1,2);
 

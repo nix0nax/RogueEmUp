@@ -7,15 +7,20 @@ public partial class Fight : Node2D
 
 	public bool gameOver;
 	public int playerHealth;
+	public int playerMaxHealth;
+	float fifthHealth;
 	Node rootNode;
 	Label gameOverNode;
+	Label levelNode;
+	public int level;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		gameOver = false;
 		rootNode = this.GetTree().Root;
 		gameOverNode = (Label)this.GetNode<Label>("UI/GameOver");
-		gameOverNode.LinesSkipped = 1;
+		gameOverNode.Visible = false;
+		fifthHealth = playerMaxHealth / 5;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -45,7 +50,7 @@ public partial class Fight : Node2D
 		var healthNode = this.GetNode<Sprite2D>("UI/Health");
 		
 		playerHealth = setHealthTo;
-		if (playerHealth < 1)
+		if (playerHealth <= fifthHealth * 0)
 		{
 			if (!gameOver)
 			{
@@ -54,46 +59,52 @@ public partial class Fight : Node2D
 			}
 			healthNode.Frame = 62;
 		}
-		else if (playerHealth < 21)
+		else if (playerHealth <= fifthHealth)
 		{
 			healthNode.Frame = 61;
 		}
-		else if (playerHealth < 41)
+		else if (playerHealth <= fifthHealth * 2)
 		{
 			healthNode.Frame = 60;
 		}
-		else if (playerHealth < 61)
+		else if (playerHealth <= fifthHealth * 3)
 		{
 			healthNode.Frame = 59;
 		}
-		else if (playerHealth < 81)
+		else if (playerHealth <= fifthHealth * 4)
 		{
 			healthNode.Frame = 58;
 		}
 		else
 		{
 			healthNode.Frame = 57;
-
 		}
 	}
 
 	public void PlayerSetHighscore(int score){
 
 		var scoreNode = (Label)this.GetNode<Label>("UI/HighScoreInt");
-		scoreNode.Text = (scoreNode.Text.ToInt() + score).ToString();
+		scoreNode.Text = (scoreNode.Text.ToInt() + score).ToString("0000000");
 		if(scoreNode.Text.ToInt() < 0){
-			scoreNode.Text = "0";
+			scoreNode.Text = "0000000";
 		}
 	}
 
 	public void PlayerGameOver(){
 
-		gameOverNode.LinesSkipped = 0;
-		Player player = (Player)rootNode.GetNode("Fight/Player");
+		gameOverNode.Visible = true;
+		Player player = (Player)this.GetNode("Player");
 
 		// animation da se destroyne
 		player.QueueFree();
 		// po parih sekundah gre na play again
 		//naret še da utripa (line skipped 0 pa 1 );
+	}
+
+	public void SetLevel(int levelToSet)
+	{
+		level = levelToSet;
+		levelNode = (Label)this.GetNode<Label>("UI/Stage");
+		levelNode.Text = $"STAGE\n{level}";
 	}
 }

@@ -794,4 +794,6 @@ position = Vector2(-17, 3)
 shape = SubResource("RectangleShape2D_lr50u")
 disabled = true
 
+[node name="ThinkingTimer" type="Timer" parent="."]
+
 [connection signal="area_entered" from="Heavy" to="." method="HeavyHit"]

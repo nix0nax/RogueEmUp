@@ -4,9 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://5jefv0fulg8" path="res://Scenes/Floor.tscn" id="1_ypx55"]
 [ext_resource type="FontFile" uid="uid://ccwwit1i3xw5b" path="res://Resources/Font/PixeloidMono-d94EV.ttf" id="3_yrr5g"]
 [ext_resource type="Texture2D" uid="uid://cu66guqjxf78b" path="res://Resources/Sprites/Pixel UI pack 3/04.png" id="4_j7q13"]
-[ext_resource type="PackedScene" uid="uid://uh5wf2a1binu" path="res://Scenes/Plant.tscn" id="5_otd58"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_k2tnj"]
+font = ExtResource("3_yrr5g")
+
+[sub_resource type="LabelSettings" id="LabelSettings_q6kv0"]
 font = ExtResource("3_yrr5g")
 
 [node name="Node2D" type="Node2D"]
@@ -46,16 +48,31 @@ label_settings = SubResource("LabelSettings_k2tnj")
 
 [node name="GameOver" type="Label" parent="UI"]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -361.0
-offset_top = 100.0
-offset_right = -264.0
-offset_bottom = 123.0
-grow_horizontal = 0
-text = "GAME OVER"
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -107.0
+offset_top = 67.5
+offset_right = 107.0
+offset_bottom = 136.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "GAME OVER
+
+PRESS J TO TRY AGAIN"
 label_settings = SubResource("LabelSettings_k2tnj")
+horizontal_alignment = 1
+
+[node name="Stage" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 293.0
+offset_right = 347.0
+offset_bottom = 23.0
+text = "STAGE"
+label_settings = SubResource("LabelSettings_q6kv0")
+horizontal_alignment = 1
 
 [node name="Health" type="Sprite2D" parent="UI"]
 position = Vector2(72, 24)
@@ -64,9 +81,6 @@ texture = ExtResource("4_j7q13")
 hframes = 7
 vframes = 15
 frame = 57
-
-[node name="Plant" parent="." instance=ExtResource("5_otd58")]
-position = Vector2(513, 274)
 
 [connection signal="body_entered" from="Floor/Area2D" to="." method="TopEnter"]
 [connection signal="body_exited" from="Floor/Area2D" to="." method="TopExit"]

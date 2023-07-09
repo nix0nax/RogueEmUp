@@ -4,11 +4,13 @@ using System.Diagnostics;
 
 public partial class Player : AnimatableBody2D
 {
-	public int health = 100;
+	public int maxHealth;
+	public int health;
 	public int speed = 4;
-	public int heavyDamage = 15;
+	public int heavyDamage;
 	public float heavyDamageTimer = 0.4F;
-	public int lightDamage = 5;
+	public float heavyAttackSpeed;
+	public int lightDamage;
 	public float lightDamageTimer = 0.1F;
 
 	public bool canComboTimer;
@@ -68,7 +70,7 @@ public partial class Player : AnimatableBody2D
 	public override void _PhysicsProcess(double delta)
 	{
 
-		if (hurt && !animationPlayer.IsPlaying())
+		if (hurt && !animationPlayer.IsPlaying()  && animationPlayer.CurrentAnimationLength == animationPlayer.CurrentAnimationPosition)
 		{
 			hurt = false;
 		}
@@ -86,7 +88,7 @@ public partial class Player : AnimatableBody2D
 		}
 
 		// process attacks FIRST (this is to allow attacking during damage pause)
-		if (attacking && !damagePaused && !animationPlayer.IsPlaying())
+		if (attacking && !damagePaused && !animationPlayer.IsPlaying()  && animationPlayer.CurrentAnimationLength == animationPlayer.CurrentAnimationPosition)
 		{
 			attacking = false;
 			canComboInput = true;
@@ -96,6 +98,7 @@ public partial class Player : AnimatableBody2D
 		if ((!attacking || (canComboTimer && canComboInput)) && Input.IsActionJustPressed("Attack"))
 		{
 			var attackType = string.Empty;
+			var attackSpeed = 1F;
 			attacking = true;
 			canComboTimer = false;
 			moving = false;
@@ -114,12 +117,13 @@ public partial class Player : AnimatableBody2D
 			{
 				//attackType = "special";
 				attackType = "heavy";
+				attackSpeed = heavyAttackSpeed;
 			}
 
 			if (!string.IsNullOrEmpty(attackType))
 			{
 				animationPlayer.Stop();
-				animationPlayer.Play($"{attackType}{directionString}");
+				animationPlayer.Play($"{attackType}{directionString}", customSpeed: attackSpeed);
 			}
 		};
 
@@ -232,6 +236,15 @@ public partial class Player : AnimatableBody2D
 		directionString = facingRight ? "_right" : "_left";
 		animationPlayer.Play($"hurt{directionString}");
 		((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(-15);
+
+		if (health < 0)
+		{
+			mainNode.HitOccured(2F);
+		}
+		else
+		{
+			mainNode.HitOccured(lightDamageTimer);
+		}
 	}
 }
 
