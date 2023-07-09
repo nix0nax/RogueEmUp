@@ -1,4 +1,4 @@
-"# RogueEmUp" 
+
 # RogueEmUp
 
 https://jesse-m.itch.io/skeleton-pack
@@ -26,6 +26,7 @@ TO-DO:
 enemies and players actually dying (add animation plus logic)
 change scene when all enemies dead (to lahko tudi jaz)
 actual funkcionalnost za health/upgrade select (probably še en screen za selectanje upgrada)
-game over screen
+
 DONE:
+Game over screen
 high score (just incremented with every succesful hit menda)
