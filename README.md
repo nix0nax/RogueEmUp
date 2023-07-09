@@ -21,3 +21,11 @@ https://admurin.itch.io/parallax-backgrounds-dead-forest
 https://ycaivus.itch.io/pixel-shadow-monsters
 
 https://zneeke.itch.io/dark-fantasy-monster-pack-1
+
+TO-DO:
+enemies and players actually dying (add animation plus logic)
+change scene when all enemies dead (to lahko tudi jaz)
+actual funkcionalnost za health/upgrade select (probably še en screen za selectanje upgrada)
+game over screen
+DONE:
+high score (just incremented with every succesful hit menda)
