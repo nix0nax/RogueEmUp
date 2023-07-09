@@ -6,10 +6,11 @@ public partial class Fight : Node2D
 {
 
 	public int playerHealth;
+	Node rootNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		playerHealth = 100;
+		rootNode = this.GetTree().Root;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -61,6 +62,15 @@ public partial class Fight : Node2D
 		else
 		{
 			healthNode.Frame = 57;
+		}
+	}
+
+	public void PlayerSetHighscore(int score){
+
+		var scoreNode = (Label)this.GetNode<Label>("UI/HighScoreInt");
+		scoreNode.Text = (scoreNode.Text.ToInt() + score).ToString();
+		if(scoreNode.Text.ToInt() < 0){
+			scoreNode.Text = "0";
 		}
 	}
 }

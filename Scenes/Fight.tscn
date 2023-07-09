@@ -32,6 +32,18 @@ grow_horizontal = 0
 text = "HISCORE"
 label_settings = SubResource("LabelSettings_k2tnj")
 
+[node name="HighScoreInt" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -75.0
+offset_top = 17.0
+offset_bottom = 40.0
+grow_horizontal = 0
+text = "0000000"
+label_settings = SubResource("LabelSettings_k2tnj")
+
 [node name="Health" type="Sprite2D" parent="UI"]
 position = Vector2(72, 24)
 scale = Vector2(3, 3)
