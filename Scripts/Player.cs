@@ -108,6 +108,7 @@ public partial class Player : AnimatableBody2D
 			if (Input.IsActionJustPressed("Heavy"))
 			{
 				attackType = "heavy";
+				attackSpeed = heavyAttackSpeed;
 			}
 			else if (Input.IsActionJustPressed("Light"))
 			{
@@ -213,9 +214,8 @@ public partial class Player : AnimatableBody2D
 		if (node.GetType() == typeof(EnemyHitbox))
 		{
 			EnemyHitbox enemyNode = (EnemyHitbox)node;
-			enemyNode.TakeDamage(heavyDamage, ((Enemy)enemyNode.GetParent()).Position.X < this.Position.X ? true : false);
-			((Enemy)enemyNode.GetParent()).damagePaused = true;
-			((Enemy)enemyNode.GetParent()).damageTimer.Start(lightDamageTimer);
+			enemyNode.TakeDamage(lightDamage, ((Enemy)enemyNode.GetParent()).Position.X < this.Position.X ? true : false);
+			//((Enemy)enemyNode.GetParent()).StartDamageTimer(lightDamageTimer);
 			((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(10);
 		}
 

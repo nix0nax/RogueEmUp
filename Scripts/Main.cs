@@ -145,7 +145,8 @@ public partial class Main : Node2D
 						playerHealth = 100;
 						changeScene = true;
 						level = 1;
-						animationToWaitFor = rootNode.GetNode("Fight/Player").GetNode<AnimationPlayer>("AnimationPlayer");
+						//animationToWaitFor = rootNode.GetNode("Fight/Player").GetNode<AnimationPlayer>("AnimationPlayer");
+						animationToWaitFor = null;
 					}
 					break;
 				case CurrentScene.UpgradeSelect:
@@ -177,17 +178,21 @@ public partial class Main : Node2D
 		
 
 		// get total number of enemies to spawn and choose how many of which
-		numOfEnemies = rng.Next(1,2 * level);
+		numOfEnemies = rng.Next(1 * level,2 * level);
 		//var numOfskeletons = rng.Next(1,4);
 		var numOfEmeny = numOfEnemies;// - numOfskeletons;
 
 		// Spawn emeny enemy
 		for (int i = 0; i < numOfEmeny; i++)
 		{
-			var emeny = ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn").Instantiate();
+			Enemy emeny = (Enemy)ResourceLoader.Load<PackedScene>("res://Scenes/Enemy.tscn").Instantiate();
 			((Node2D)emeny).Position = new Vector2(rng.Next(floorx), rng.Next(floorylow, flooryhi));
+			emeny.heavyDamage = 10 + 5 * rng.Next(0, level/2);
+			emeny.heavyAttackSpeed = 1F + 0.2F * rng.Next(0, level/2);
+			emeny.speed = 4 + rng.Next(0, level/2);
+			emeny.health = 50 + 10 * + rng.Next(0, level);
 			scene.AddChild(emeny);
-			enemies.Add((Enemy)emeny);
+			enemies.Add(emeny);
 		}
 
 		((Fight)scene).SetLevel(level);

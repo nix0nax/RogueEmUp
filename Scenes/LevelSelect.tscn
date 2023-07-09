@@ -61,7 +61,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": ["HEAL 25 HP"]
+"values": ["COMPLETELY HEAL"]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -136,7 +136,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": ["HEAL 25 HP"]
+"values": ["COMPLETELY HEAL"]
 }
 tracks/4/type = "value"
 tracks/4/imported = false

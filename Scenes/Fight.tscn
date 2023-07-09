@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://b02ooqixlntwx"]
+[gd_scene load_steps=8 format=3 uid="uid://b02ooqixlntwx"]
 
 [ext_resource type="Script" path="res://Scripts/Fight.cs" id="1_fersm"]
 [ext_resource type="PackedScene" uid="uid://5jefv0fulg8" path="res://Scenes/Floor.tscn" id="1_ypx55"]
+[ext_resource type="Texture2D" uid="uid://b2kdhjd7b2d52" path="res://Resources/Sprites/Background.png" id="2_mlry6"]
 [ext_resource type="FontFile" uid="uid://ccwwit1i3xw5b" path="res://Resources/Font/PixeloidMono-d94EV.ttf" id="3_yrr5g"]
 [ext_resource type="Texture2D" uid="uid://cu66guqjxf78b" path="res://Resources/Sprites/Pixel UI pack 3/04.png" id="4_j7q13"]
 
@@ -14,8 +15,16 @@ font = ExtResource("3_yrr5g")
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_fersm")
 
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_right = 640.0
+offset_bottom = 180.0
+texture = ExtResource("2_mlry6")
+
 [node name="Floor" parent="." instance=ExtResource("1_ypx55")]
 position = Vector2(320, 270)
+
+[node name="ColorRect" parent="Floor/StaticBody2D" index="0"]
+color = Color(0.117647, 0.317647, 0.133333, 1)
 
 [node name="UI" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(640, 45)

@@ -5,6 +5,9 @@ using System.Diagnostics;
 public partial class Enemy : Area2D
 {
 	public int speed = 4;
+	public float heavyAttackSpeed;
+	public int heavyDamage = 10;
+	public float heavyDamageTimer = 0.4F;
 	public bool thinking;
 	public bool damagePaused;
 	public bool hurt;
@@ -15,8 +18,6 @@ public partial class Enemy : Area2D
 	public bool collidingWithTop;
 	public bool chasingPlayer = false;
 	public int directionPlayer = -1;
-	public int heavyDamage = 10;
-	public float heavyDamageTimer = 0.4F;
 	Vector2 velocity;
 	Random rng;
 	Node rootNode;
@@ -33,7 +34,7 @@ public partial class Enemy : Area2D
 	public Timer damageTimer;
 	public Timer thinkingTimer;
 
-	int health;
+	public int health = 50;
 
 	public AnimatedSprite2D animatedSprite;
 	public AnimationPlayer animationPlayer;
@@ -70,8 +71,6 @@ public partial class Enemy : Area2D
 		directionString = "_right";
 		moving = false;
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
-
-		health = 50;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -92,6 +91,12 @@ public partial class Enemy : Area2D
 
 				this.QueueFree();
 			}
+		}
+
+		// playing hurt animation
+		if (hurt)
+		{
+			return;
 		}
 
 		if (((Fight)this.GetParent()).gameOver)
@@ -129,7 +134,10 @@ public partial class Enemy : Area2D
 
 		if (thinking)
 		{
-			animationPlayer.Play($"idle{directionString}");
+			if (!hurt)
+			{
+				animationPlayer.Play($"idle{directionString}");
+			}
 			return;
 		}
 
@@ -233,7 +241,7 @@ public partial class Enemy : Area2D
 
 			if (!string.IsNullOrEmpty(attackType))
 			{
-				animationPlayer.Play($"{attackType}{directionString}");
+				animationPlayer.Play($"{attackType}{directionString}", customSpeed: heavyAttackSpeed);
 			}
 		};
 
@@ -253,18 +261,6 @@ public partial class Enemy : Area2D
 		this.Position += velocity;
 	}
 
-	//private void UpdateAnimationParameters(){
-	//	animationTree.Set("parameters/isIdle",true);
-//
-	//}
-
-	private void OnPunchHitAreaEntered(Area2D area)
-	{	
-		if(area.IsInGroup(new StringName("HurtBox"))){
-			
-		}
-	}
-
 	private void HeavyHit(Node2D node)
 	{
 		if (node.GetType() == typeof(PlayerHitbox))
@@ -280,6 +276,7 @@ public partial class Enemy : Area2D
 		health -= damage;
 		hurt = true;
 		directionString = facingRight ? "_right" : "_left";
+		attacking = false;
 		if (health < 0)
 		{
 			animationPlayer.Play($"death{directionString}");
@@ -288,6 +285,15 @@ public partial class Enemy : Area2D
 		{
 			animationPlayer.Play($"hurt{directionString}");
 		}
+	}
+
+	public void StartDamageTimer(float time)
+	{
+		damagePaused = true;
+		attacking = false;
+		decided = false;
+		chasingPlayer = false;
+		damageTimer.Start(time);
 	}
 }
 
