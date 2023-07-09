@@ -5,12 +5,14 @@ using System.Diagnostics;
 public partial class Fight : Node2D
 {
 
+	public bool gameOver;
 	public int playerHealth;
 	Node rootNode;
 	Label gameOverNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		gameOver = false;
 		rootNode = this.GetTree().Root;
 		gameOverNode = (Label)this.GetNode<Label>("UI/GameOver");
 		gameOverNode.LinesSkipped = 1;
@@ -45,7 +47,11 @@ public partial class Fight : Node2D
 		playerHealth = setHealthTo;
 		if (playerHealth < 1)
 		{
-			this.PlayerGameOver();
+			if (!gameOver)
+			{
+				this.PlayerGameOver();
+				gameOver = true;
+			}
 			healthNode.Frame = 62;
 		}
 		else if (playerHealth < 21)

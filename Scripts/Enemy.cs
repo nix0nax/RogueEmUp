@@ -28,6 +28,7 @@ public partial class Enemy : Area2D
 	int marginY = 10;
 
 	Player player;
+	ulong playerId;
 	public Timer damageTimer;
 
 	int health;
@@ -43,6 +44,7 @@ public partial class Enemy : Area2D
 		mainNode = rootNode.GetNode<Main>("Main");
 
 		player = (Player)rootNode.GetNode("Fight/Player");
+		playerId = player.GetInstanceId();
 		rng = new Random();
 		velocity = new Vector2(0,0);
 
@@ -80,6 +82,11 @@ public partial class Enemy : Area2D
 			}
 		}
 
+		if (((Fight)this.GetParent()).gameOver)
+		{
+			chasingPlayer = false;
+		}
+
 		// If paused, literally do nothing 
 		if (damagePaused)
 		{
@@ -90,7 +97,7 @@ public partial class Enemy : Area2D
 			//naj si zbere kaj bo glede na random
 			long decision = rng.Next(0,101);
 
-			if (decision < 50)
+			if (decision < 50 && !((Fight)this.GetParent()).gameOver)
 			{
 					//	Idi do playerja pa ga vsipaj
 					directionPlayer = rng.Next(0,2) == 1 ? -1 : 1;
@@ -170,7 +177,7 @@ public partial class Enemy : Area2D
 			attacking = false;
 		}
 
-		var distanceToPlayer = player.Position - Position;
+		var distanceToPlayer = ((Fight)this.GetParent()).gameOver ? Vector2.Zero : player.Position - Position;
 		// Attacks go here
 		if (!attacking && Math.Abs(distanceToPlayer.X) < marginXHigh && Math.Abs(distanceToPlayer.X) > marginXLow && Math.Abs(distanceToPlayer.Y) < marginY)
 		{
