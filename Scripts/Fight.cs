@@ -7,10 +7,13 @@ public partial class Fight : Node2D
 
 	public int playerHealth;
 	Node rootNode;
+	Label gameOverNode;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		rootNode = this.GetTree().Root;
+		gameOverNode = (Label)this.GetNode<Label>("UI/GameOver");
+		gameOverNode.LinesSkipped = 1;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -38,9 +41,11 @@ public partial class Fight : Node2D
 	public void PlayerSetHealth(int setHealthTo)
 	{
 		var healthNode = this.GetNode<Sprite2D>("UI/Health");
+		
 		playerHealth = setHealthTo;
 		if (playerHealth < 1)
 		{
+			this.PlayerGameOver();
 			healthNode.Frame = 62;
 		}
 		else if (playerHealth < 21)
@@ -62,6 +67,7 @@ public partial class Fight : Node2D
 		else
 		{
 			healthNode.Frame = 57;
+
 		}
 	}
 
@@ -72,5 +78,16 @@ public partial class Fight : Node2D
 		if(scoreNode.Text.ToInt() < 0){
 			scoreNode.Text = "0";
 		}
+	}
+
+	public void PlayerGameOver(){
+
+		gameOverNode.LinesSkipped = 0;
+		Player player = (Player)rootNode.GetNode("Fight/Player");
+
+		// animation da se destroyne
+		player.QueueFree();
+		// po parih sekundah gre na play again
+		//naret še da utripa (line skipped 0 pa 1 );
 	}
 }

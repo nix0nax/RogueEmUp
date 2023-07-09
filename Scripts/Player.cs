@@ -29,6 +29,7 @@ public partial class Player : AnimatableBody2D
 	Timer comboTimer;
 	Node rootNode;
 	Main mainNode;
+	Player player;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -56,6 +57,7 @@ public partial class Player : AnimatableBody2D
 		velocity = new Vector2(0,0);
 		animationPlayer = this.GetNode<AnimationPlayer>("AnimationPlayer");
 		((Fight)rootNode.GetNode("Fight")).PlayerSetHighscore(0);
+		player = (Player)rootNode.GetNode("Fight/Player");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
