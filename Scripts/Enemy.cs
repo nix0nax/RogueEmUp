@@ -73,6 +73,11 @@ public partial class Enemy : Area2D
 		if (hurt && !animationPlayer.IsPlaying())
 		{
 			hurt = false;
+			if (health < 0)
+			{
+				((Main)rootNode.GetNode("Main")).numOfEnemies -= 1;
+				this.QueueFree();
+			}
 		}
 
 		// If paused, literally do nothing 
@@ -242,7 +247,14 @@ public partial class Enemy : Area2D
 		health -= damage;
 		hurt = true;
 		directionString = facingRight ? "_right" : "_left";
-		animationPlayer.Play($"hurt{directionString}");
+		if (health < 0)
+		{
+			animationPlayer.Play($"death{directionString}");
+		}
+		else
+		{
+			animationPlayer.Play($"hurt{directionString}");
+		}
 	}
 }
 

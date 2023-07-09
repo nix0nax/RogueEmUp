@@ -16,6 +16,7 @@ public partial class Main : Node2D
 	}
 
 	CurrentScene currentScene;
+	CurrentScene goToScene;
 	bool changeScene;
 	AnimationPlayer animationToWaitFor;
 	Random rng;
@@ -23,7 +24,7 @@ public partial class Main : Node2D
 	int floorylow = 185;
 	int flooryhi = 350;
 
-	int numOfEnemies;
+	public int numOfEnemies;
 	public int playerHealth;
 	public int highScore;
 
@@ -37,6 +38,7 @@ public partial class Main : Node2D
 		rng = new Random();
 		rootNode = this.GetTree().Root;
 		currentScene = CurrentScene.Start;
+		goToScene = CurrentScene.Fight;
 		animationToWaitFor = this.GetNode("StartScreen").GetNode<AnimationPlayer>("AnimationPlayer");
 		numOfEnemies = 0;
 	}
