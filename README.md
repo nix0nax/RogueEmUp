@@ -1,4 +1,4 @@
 
 # RogueEmUp
 
-Look I know this is just a loose collection of spaghetti code. I spent like 3 days just trying to learn and use godot so I wasn't exactly following best practices. It does function tho :)
+An (adimttedly badly coded) beat em up game made for a game jam in 3 days. I went into this without knowing any Godot. 
